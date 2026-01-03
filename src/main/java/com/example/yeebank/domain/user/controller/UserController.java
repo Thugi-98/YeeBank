@@ -7,6 +7,7 @@ import com.example.yeebank.domain.user.dto.response.UserGetAllResponseDto;
 import com.example.yeebank.domain.user.dto.response.UserGetDetailResponseDto;
 import com.example.yeebank.domain.user.dto.response.UserUpdateResponseDto;
 import com.example.yeebank.domain.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class UserController {
      */
     @PostMapping
     public ResponseEntity<UserCreateResponseDto> createUserApi(
-            @RequestBody UserCreateRequestDto requestDto
+            @Valid @RequestBody UserCreateRequestDto requestDto
     ) {
         UserCreateResponseDto responseDto = userService.createUser(requestDto);
 
@@ -67,7 +68,7 @@ public class UserController {
     @PutMapping("/{userId}")
     public ResponseEntity<UserUpdateResponseDto> updateUserApi(
             @PathVariable("userId") Long userId,
-            @RequestBody UserUpdateRequestDto requestDto
+            @Valid @RequestBody UserUpdateRequestDto requestDto
     ) {
         UserUpdateResponseDto responseDto = userService.updateUser(userId, requestDto);
 
