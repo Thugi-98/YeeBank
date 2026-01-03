@@ -1,5 +1,6 @@
 package com.example.yeebank.domain.user.dto.response;
 
+import com.example.yeebank.domain.user.dto.dto.UserDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -14,4 +15,14 @@ public class UserUpdateResponseDto {
     private final String email;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
+
+    public static UserUpdateResponseDto from(UserDto dto) {
+        return new UserUpdateResponseDto(
+                dto.getId(),
+                dto.getName(),
+                dto.getEmail(),
+                dto.getCreateAt(),
+                dto.getUpdatedAt()
+        );
+    }
 }

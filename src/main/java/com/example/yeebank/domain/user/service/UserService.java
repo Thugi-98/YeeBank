@@ -1,5 +1,6 @@
 package com.example.yeebank.domain.user.service;
 
+import com.example.yeebank.domain.user.dto.dto.UserDto;
 import com.example.yeebank.domain.user.dto.request.UserCreateRequestDto;
 import com.example.yeebank.domain.user.dto.request.UserUpdateRequestDto;
 import com.example.yeebank.domain.user.dto.response.UserCreateResponseDto;
@@ -12,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,24 +27,18 @@ public class UserService {
      */
     @Transactional
     public UserCreateResponseDto createUser(UserCreateRequestDto requestDto) {
+
         User user = new User(
                 requestDto.getName(),
                 requestDto.getEmail(),
                 requestDto.getPassword()
-
         );
 
         User saveUser = userRepository.save(user);
 
-        UserCreateResponseDto responseDto = new UserCreateResponseDto(
-                saveUser.getId(),
-                saveUser.getName(),
-                saveUser.getEmail(),
-                saveUser.getCreatedAt(),
-                saveUser.getUpdatedAt()
-        );
+        UserDto responseDto = UserDto.from(saveUser);
 
-        return responseDto;
+        return UserCreateResponseDto.from(responseDto);
     }
 
     /**
@@ -55,15 +49,9 @@ public class UserService {
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new RuntimeException(""));
 
-        UserGetDetailResponseDto responseDto = new UserGetDetailResponseDto(
-                findUser.getId(),
-                findUser.getName(),
-                findUser.getEmail(),
-                findUser.getCreatedAt(),
-                findUser.getUpdatedAt()
-        );
+        UserDto responseDto = UserDto.from(findUser);
 
-        return responseDto;
+        return UserGetDetailResponseDto.from(responseDto);
     }
 
     /**
@@ -78,19 +66,11 @@ public class UserService {
         List<UserGetAllResponseDto.UserListResponseDto> dtoList = new ArrayList<>();
 
         for (User user : findUserList) {
-            UserGetAllResponseDto.UserListResponseDto dto = new UserGetAllResponseDto.UserListResponseDto(
-                    user.getId(),
-                    user.getName(),
-                    user.getEmail(),
-                    user.getCreatedAt()
-            );
-
+            UserGetAllResponseDto.UserListResponseDto dto = UserGetAllResponseDto.UserListResponseDto.from(UserDto.from(user));
             dtoList.add(dto);
         }
 
-        UserGetAllResponseDto responseDto = new UserGetAllResponseDto(count, dtoList);
-
-        return responseDto;
+        return new UserGetAllResponseDto(count, dtoList);
     }
 
     /**
@@ -99,7 +79,7 @@ public class UserService {
     @Transactional
     public UserUpdateResponseDto updateUser(Long userId, UserUpdateRequestDto requestDto) {
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new RuntimeException(""));
 
         findUser.updateUser(
                 requestDto.getName(),
@@ -107,15 +87,9 @@ public class UserService {
                 requestDto.getPassword()
         );
 
-        UserUpdateResponseDto responseDto = new UserUpdateResponseDto(
-                findUser.getId(),
-                findUser.getName(),
-                findUser.getEmail(),
-                findUser.getCreatedAt(),
-                findUser.getUpdatedAt()
-        );
+        UserDto responseDto = UserDto.from(findUser);
 
-        return responseDto;
+        return UserUpdateResponseDto.from(responseDto);
     }
 
     /**
@@ -127,8 +101,6 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException(""));
 
         findUser.deleteUser();
-
-
     }
 
 }
