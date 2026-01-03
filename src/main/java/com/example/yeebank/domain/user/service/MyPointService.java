@@ -1,6 +1,8 @@
 package com.example.yeebank.domain.user.service;
 
+import com.example.yeebank.domain.user.dto.request.UserPointEarnPointRequestDto;
 import com.example.yeebank.domain.user.dto.response.UserPointAttendancePointResponseDto;
+import com.example.yeebank.domain.user.dto.response.UserPointEarnPointResponseDto;
 import com.example.yeebank.domain.user.entity.User;
 import com.example.yeebank.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +18,33 @@ public class MyPointService {
 
     private final UserRepository userRepository;
 
-
+    /**
+     * 포인트 적립 로직
+     */
     @Transactional
-    public void earnPoint() {
+    public UserPointEarnPointResponseDto earnPoint(Long userId, UserPointEarnPointRequestDto requestDto) {
+
+        User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new RuntimeException(""));
+
+        findUser.earnPoint(requestDto.getEarnPoint());
+
+        UserPointEarnPointResponseDto responseDto = new UserPointEarnPointResponseDto(
+                findUser.getId(),
+                findUser.getName(),
+                requestDto.getEarnPoint(),
+                findUser.getMyPoint()
+        );
+
+        return responseDto;
 
     }
 
+    /**
+     * 출석체크 포인트 적립 로직
+     */
     @Transactional
-    public UserPointAttendancePointResponseDto attendancePoint(Long userId ,LocalDate attendanceDate) {
+    public UserPointAttendancePointResponseDto attendancePoint(Long userId, LocalDate attendanceDate) {
 
         LocalDateTime now = LocalDateTime.now();
         LocalDate today = now.toLocalDate();
