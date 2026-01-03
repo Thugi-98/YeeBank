@@ -27,11 +27,17 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private long myPoint = 0;
+
     @Column
     private Boolean isDeleted = false;
 
     @Column
     private LocalDateTime deletedAt;
+
+    @Column
+    private LocalDateTime attendanceAt;
 
     public User(String name, String email, String password) {
         this.name = name;
@@ -47,5 +53,32 @@ public class User extends BaseEntity {
 
     public void deleteUser() {
         this.isDeleted = true;
+    }
+
+    // 포인트
+    public void earnPoint(long earn) {
+        this.myPoint += earn;
+    }
+
+    public void earnAttendancePoint(LocalDateTime today) {
+        if (attendanceAt != null && attendanceAt.toLocalDate().equals(today.toLocalDate())) {
+            throw new RuntimeException("오늘은 이미 출석체크 완료 되었습니다");
+        }
+
+        this.attendanceAt = today;
+        earnPoint(100);
+    }
+
+    public void usePoint(long usePoint) {
+
+        if (usePoint < 0) {
+            throw new RuntimeException("사용가능 하신 포인트는 1 포인트 이상입니다");
+        }
+
+        if (this.myPoint < usePoint) {
+            throw new RuntimeException("보유하신 포인트가 부족합니다");
+        }
+
+        this.myPoint -= usePoint;
     }
 }
