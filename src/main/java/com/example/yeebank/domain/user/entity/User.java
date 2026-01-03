@@ -32,4 +32,20 @@ public class User extends BaseEntity {
 
     @Column
     private LocalDateTime deletedAt;
+
+    public User(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+
+    public void updateUser(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+
+    public void deleteUser() {
+        this.isDeleted = true;
+    }
 }
