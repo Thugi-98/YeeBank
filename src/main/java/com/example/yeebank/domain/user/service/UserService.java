@@ -10,6 +10,7 @@ import com.example.yeebank.domain.user.dto.response.UserUpdateResponseDto;
 import com.example.yeebank.domain.user.entity.User;
 import com.example.yeebank.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 유저 회원가입(생성) 로직
@@ -28,10 +30,12 @@ public class UserService {
     @Transactional
     public UserCreateResponseDto createUser(UserCreateRequestDto requestDto) {
 
+        String encodePassword = passwordEncoder.encode(requestDto.getPassword());
+
         User user = new User(
                 requestDto.getName(),
                 requestDto.getEmail(),
-                requestDto.getPassword()
+                encodePassword
         );
 
         User saveUser = userRepository.save(user);
