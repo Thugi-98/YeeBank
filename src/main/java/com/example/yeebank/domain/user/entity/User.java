@@ -71,7 +71,7 @@ public class User extends BaseEntity {
 
     public void usePoint(long usePoint) {
 
-        if (usePoint < 0) {
+        if (usePoint < 1) {
             throw new RuntimeException("사용가능 하신 포인트는 1 포인트 이상입니다");
         }
 

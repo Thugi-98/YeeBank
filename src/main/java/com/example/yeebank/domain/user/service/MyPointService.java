@@ -1,8 +1,10 @@
 package com.example.yeebank.domain.user.service;
 
 import com.example.yeebank.domain.user.dto.request.UserPointEarnPointRequestDto;
+import com.example.yeebank.domain.user.dto.request.UserPointUsePointRequestDto;
 import com.example.yeebank.domain.user.dto.response.UserPointAttendancePointResponseDto;
 import com.example.yeebank.domain.user.dto.response.UserPointEarnPointResponseDto;
+import com.example.yeebank.domain.user.dto.response.UserPointUsePointResponseDto;
 import com.example.yeebank.domain.user.entity.User;
 import com.example.yeebank.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -71,9 +73,25 @@ public class MyPointService {
 
     }
 
+    /**
+     * 포인트 사용 로직
+     */
     @Transactional
-    public void usePoint() {
+    public UserPointUsePointResponseDto usePoint(Long userId, UserPointUsePointRequestDto requestDto) {
 
+        User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new RuntimeException(""));
+
+        findUser.usePoint(requestDto.getUsePoint());
+
+        UserPointUsePointResponseDto responseDto = new UserPointUsePointResponseDto(
+                findUser.getId(),
+                findUser.getName(),
+                requestDto.getUsePoint(),
+                findUser.getMyPoint()
+        );
+
+        return responseDto;
     }
 
     @Transactional

@@ -1,10 +1,13 @@
 package com.example.yeebank.domain.user.controller;
 
 import com.example.yeebank.domain.user.dto.request.UserPointEarnPointRequestDto;
+import com.example.yeebank.domain.user.dto.request.UserPointUsePointRequestDto;
 import com.example.yeebank.domain.user.dto.response.UserPointAttendancePointResponseDto;
 import com.example.yeebank.domain.user.dto.response.UserPointEarnPointResponseDto;
+import com.example.yeebank.domain.user.dto.response.UserPointUsePointResponseDto;
 import com.example.yeebank.domain.user.service.MyPointService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +48,21 @@ public class MyPointController {
         UserPointAttendancePointResponseDto responseDto = myPointService.attendancePoint(userId, attendanceDate);
 
         ResponseEntity<UserPointAttendancePointResponseDto> response = new ResponseEntity<>(responseDto, HttpStatus.OK);
+
+        return response;
+    }
+
+    /**
+     * 포인트 사용 API
+     */
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserPointUsePointResponseDto> usePoint(
+            @PathVariable("userId") Long userId,
+            @RequestBody UserPointUsePointRequestDto requestDto
+            ) {
+        UserPointUsePointResponseDto responseDto = myPointService.usePoint(userId, requestDto);
+
+        ResponseEntity<UserPointUsePointResponseDto> response = new ResponseEntity<>(responseDto, HttpStatus.OK);
 
         return response;
     }
