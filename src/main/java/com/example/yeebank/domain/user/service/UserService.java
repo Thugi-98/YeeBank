@@ -30,6 +30,12 @@ public class UserService {
     @Transactional
     public UserCreateResponseDto createUser(UserCreateRequestDto requestDto) {
 
+        Boolean existEmail = userRepository.existsByEmail(requestDto.getEmail());
+
+        if (existEmail) {
+            throw new RuntimeException("중복된 이메일");
+        }
+
         String encodePassword = passwordEncoder.encode(requestDto.getPassword());
 
         User user = new User(
@@ -90,6 +96,11 @@ public class UserService {
                 requestDto.getEmail(),
                 requestDto.getPassword()
         );
+
+        if (!passwordEncoder.matches(requestDto.getPassword(), findUser.getPassword())) {
+            // 400
+            throw new RuntimeException("비밀번호가 일치하지 않습니다");
+        }
 
         UserDto responseDto = UserDto.from(findUser);
 
