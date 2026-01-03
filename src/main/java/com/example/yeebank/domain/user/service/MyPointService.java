@@ -4,6 +4,7 @@ import com.example.yeebank.domain.user.dto.request.UserPointEarnPointRequestDto;
 import com.example.yeebank.domain.user.dto.request.UserPointUsePointRequestDto;
 import com.example.yeebank.domain.user.dto.response.UserPointAttendancePointResponseDto;
 import com.example.yeebank.domain.user.dto.response.UserPointEarnPointResponseDto;
+import com.example.yeebank.domain.user.dto.response.UserPointGetMyPointResponseDto;
 import com.example.yeebank.domain.user.dto.response.UserPointUsePointResponseDto;
 import com.example.yeebank.domain.user.entity.User;
 import com.example.yeebank.domain.user.repository.UserRepository;
@@ -94,8 +95,22 @@ public class MyPointService {
         return responseDto;
     }
 
-    @Transactional
-    public void getMyPoint() {
+    /**
+     * 포인트 조회 로직
+     */
+    @Transactional(readOnly = true)
+    public UserPointGetMyPointResponseDto getMyPoint(Long userId) {
+
+        User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new RuntimeException(""));
+
+        UserPointGetMyPointResponseDto responseDto = new UserPointGetMyPointResponseDto(
+                findUser.getId(),
+                findUser.getName(),
+                findUser.getMyPoint()
+        );
+
+        return responseDto;
 
     }
 
