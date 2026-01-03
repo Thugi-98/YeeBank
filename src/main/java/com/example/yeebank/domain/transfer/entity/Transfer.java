@@ -18,23 +18,15 @@ public class Transfer extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 임의로 String으로 지정했습니다! 편한 타입으로 변경하셔도 됩니다
-    @Column(length = 32, nullable = false)
-    private String account_number;
-
     @Column(nullable = false)
-    private Long password;
+    private Long amount;
 
-    @Column(length = 50, nullable = false)
-    private String alias;
+    @Column(length = 500, nullable = false)
+    private String status;
 
-    @Column(nullable = false)
-    private Long balance;
-
-    @Column(nullable = false)
-    private Boolean isDeleted = false;
+    @Column(length = 200)
+    private String fail_reason;
 
     @Column
-    private LocalDateTime deletedAt;
-
+    private Long request_client_id;
 }
