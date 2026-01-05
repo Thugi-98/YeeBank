@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-public class AccountCreateResponse {
+public class AccountDetailResponse {
+
     private final Long id;
     private final String accountNumber;
     private final String alias;
@@ -16,8 +17,8 @@ public class AccountCreateResponse {
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-    public static AccountCreateResponse from(Account account) {
-        return new AccountCreateResponse(
+    public static AccountDetailResponse from(Account account) {
+        return new AccountDetailResponse(
                 account.getId(),
                 account.getAccountNumber(),
                 account.getAlias(),
@@ -29,4 +30,3 @@ public class AccountCreateResponse {
 
     }
 }
-
