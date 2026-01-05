@@ -1,5 +1,6 @@
 package com.example.yeebank.domain.user.service;
 
+import com.example.yeebank.domain.user.dto.dto.PointDto;
 import com.example.yeebank.domain.user.dto.request.UserPointEarnPointRequestDto;
 import com.example.yeebank.domain.user.dto.request.UserPointUsePointRequestDto;
 import com.example.yeebank.domain.user.dto.response.UserPointAttendancePointResponseDto;
@@ -31,14 +32,9 @@ public class MyPointService {
 
         findUser.earnPoint(requestDto.getEarnPoint());
 
-        UserPointEarnPointResponseDto responseDto = new UserPointEarnPointResponseDto(
-                findUser.getId(),
-                findUser.getName(),
-                requestDto.getEarnPoint(),
-                findUser.getMyPoint()
-        );
+        PointDto pointDto = PointDto.from(findUser, requestDto.getEarnPoint(), 0);
 
-        return responseDto;
+        return UserPointEarnPointResponseDto.from(pointDto);
     }
 
     /**
@@ -54,7 +50,7 @@ public class MyPointService {
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new RuntimeException(""));
 
-        Boolean validDate = today.equals(attendanceDate);
+        boolean validDate = today.equals(attendanceDate);
 
         if (!validDate) {
             throw new RuntimeException("출석체크는 오늘만 가능합니다");
@@ -62,14 +58,9 @@ public class MyPointService {
 
         findUser.earnAttendancePoint(today);
 
-        UserPointAttendancePointResponseDto responseDto = new UserPointAttendancePointResponseDto(
-                findUser.getId(),
-                findUser.getName(),
-                attendancePoint,
-                findUser.getMyPoint()
-        );
+        PointDto pointDto = PointDto.from(findUser, attendancePoint, 0);
 
-        return responseDto;
+        return UserPointAttendancePointResponseDto.from(pointDto);
     }
 
     /**
@@ -83,14 +74,9 @@ public class MyPointService {
 
         findUser.usePoint(requestDto.getUsePoint());
 
-        UserPointUsePointResponseDto responseDto = new UserPointUsePointResponseDto(
-                findUser.getId(),
-                findUser.getName(),
-                requestDto.getUsePoint(),
-                findUser.getMyPoint()
-        );
+        PointDto pointDto = PointDto.from(findUser, 0, requestDto.getUsePoint());
 
-        return responseDto;
+        return UserPointUsePointResponseDto.from(pointDto);
     }
 
     /**
@@ -102,13 +88,9 @@ public class MyPointService {
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new RuntimeException(""));
 
-        UserPointGetMyPointResponseDto responseDto = new UserPointGetMyPointResponseDto(
-                findUser.getId(),
-                findUser.getName(),
-                findUser.getMyPoint()
-        );
+        PointDto pointDto = PointDto.from(findUser, 0, 0);
 
-        return responseDto;
+        return UserPointGetMyPointResponseDto.from(pointDto);
     }
 
 }
