@@ -115,7 +115,7 @@ public class UserService {
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new RuntimeException(""));
 
-        findUser.deleteUser();
+        findUser.delete();
     }
 
 }

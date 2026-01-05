@@ -32,12 +32,6 @@ public class User extends BaseEntity {
     private long myPoint = 0;
 
     @Column
-    private Boolean isDeleted = false;
-
-    @Column
-    private LocalDateTime deletedAt;
-
-    @Column
     private LocalDate attendanceAt = LocalDate.now().minusDays(1);
 
     public User(String name, String email, String password) {
@@ -50,10 +44,6 @@ public class User extends BaseEntity {
         this.name = name;
         this.email = email;
         this.password = password;
-    }
-
-    public void deleteUser() {
-        this.isDeleted = true;
     }
 
     // 포인트
