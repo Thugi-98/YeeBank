@@ -1,0 +1,1 @@
+CREATE DATABASE YeeBank HARACTER SET utf8mb4 collate utf8mb4_general_ci;

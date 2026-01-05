@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Entity
 @Table(name = "users")
@@ -16,16 +18,13 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 50, nullable = false)
+    private String name;
+
+    @Column(length = 320, unique = true, nullable = false)
+    private String email;
+
     @Column(nullable = false)
-    private Long amount;
-
-    @Column(length = 500, nullable = false)
-    private String status;
-
-    @Column(length = 200)
-    private String fail_reason;
-
-    @Column
-    private Long request_client_id;
+    private String password;
 
 }
