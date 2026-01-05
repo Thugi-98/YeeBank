@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -37,7 +38,7 @@ public class User extends BaseEntity {
     private LocalDateTime deletedAt;
 
     @Column
-    private LocalDateTime attendanceAt;
+    private LocalDate attendanceAt = LocalDate.now().minusDays(1);
 
     public User(String name, String email, String password) {
         this.name = name;
@@ -60,8 +61,9 @@ public class User extends BaseEntity {
         this.myPoint += earn;
     }
 
-    public void earnAttendancePoint(LocalDateTime today) {
-        if (attendanceAt != null && attendanceAt.toLocalDate().equals(today.toLocalDate())) {
+    public void earnAttendancePoint(LocalDate today) {
+
+        if (attendanceAt.equals(today)) {
             throw new RuntimeException("오늘은 이미 출석체크 완료 되었습니다");
         }
 

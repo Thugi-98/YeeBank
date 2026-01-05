@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +39,6 @@ public class MyPointService {
         );
 
         return responseDto;
-
     }
 
     /**
@@ -49,8 +47,9 @@ public class MyPointService {
     @Transactional
     public UserPointAttendancePointResponseDto attendancePoint(Long userId, LocalDate attendanceDate) {
 
-        LocalDateTime now = LocalDateTime.now();
-        LocalDate today = now.toLocalDate();
+        long attendancePoint = 100;
+
+        LocalDate today = LocalDate.now();
 
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new RuntimeException(""));
@@ -61,17 +60,16 @@ public class MyPointService {
             throw new RuntimeException("출석체크는 오늘만 가능합니다");
         }
 
-        findUser.earnAttendancePoint(now);
+        findUser.earnAttendancePoint(today);
 
         UserPointAttendancePointResponseDto responseDto = new UserPointAttendancePointResponseDto(
                 findUser.getId(),
                 findUser.getName(),
-                100,
+                attendancePoint,
                 findUser.getMyPoint()
         );
 
         return responseDto;
-
     }
 
     /**
@@ -111,7 +109,6 @@ public class MyPointService {
         );
 
         return responseDto;
-
     }
 
 }
