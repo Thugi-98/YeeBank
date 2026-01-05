@@ -1,6 +1,7 @@
 package com.example.yeebank.domain.account.service;
 
 import com.example.yeebank.domain.account.dto.request.AccountCreateRequest;
+import com.example.yeebank.domain.account.dto.response.AccountAllResponse;
 import com.example.yeebank.domain.account.dto.response.AccountCreateResponse;
 import com.example.yeebank.domain.account.dto.response.AccountDetailResponse;
 import com.example.yeebank.domain.account.entity.Account;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -79,6 +81,23 @@ public class AccountService {
         // 4. Response DTO로 변환 (정적 팩토리 메서드)
         return AccountDetailResponse.from(account);
     }
+
+    /// 계좌 다건 조회
+    public List<AccountAllResponse> getAccountList(Long userId){
+        log.info("계좌 목록 조회 - userId: {}", userId);
+
+        // 1. 계좌 목록 조회
+        List<Account> accountList = accountRepository.findAllByUserIdAndIsDeletedFalse(userId);
+
+        // 2. Response DTO로 변환
+        return accountList.stream()
+                .map(AccountAllResponse::from)
+                .toList();
+    }
+
+    /// 계좌 수정
+    public void updateAccount(){}
+
 
 
 }
