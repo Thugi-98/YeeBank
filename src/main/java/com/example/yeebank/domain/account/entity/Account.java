@@ -18,16 +18,20 @@ public class Account extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 50, nullable = false)
-    private String name;
-
-    @Column(length = 320, unique = true, nullable = false)
-    private String email;
+    // 임의로 String으로 지정했습니다! 편한 타입으로 변경하셔도 됩니다
+    @Column(length = 32, nullable = false)
+    private String account_number;
 
     @Column(nullable = false)
-    private String password;
+    private Long password;
 
-    @Column
+    @Column(length = 50, nullable = false)
+    private String alias;
+
+    @Column(nullable = false)
+    private Long balance;
+
+    @Column(nullable = false)
     private Boolean isDeleted = false;
 
     @Column
