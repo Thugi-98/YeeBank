@@ -27,9 +27,4 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
-    @Column
-    private Boolean isDeleted = false;
-
-    @Column
-    private LocalDateTime deletedAt;
 }

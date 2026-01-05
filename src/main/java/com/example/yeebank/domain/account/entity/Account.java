@@ -31,9 +31,4 @@ public class Account extends BaseEntity {
     @Column(nullable = false)
     private Long balance;
 
-    @Column(nullable = false)
-    private Boolean isDeleted = false;
-
-    @Column
-    private LocalDateTime deletedAt;
 }
