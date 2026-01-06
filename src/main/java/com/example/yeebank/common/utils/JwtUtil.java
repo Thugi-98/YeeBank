@@ -44,9 +44,11 @@ public class JwtUtil {
 
 
     // 토큰 생성
-    public String generateToken(String email) {
+    public String generateToken(Long userId, String name, String email) {
         Date now = new Date();
         return BEARER_PREFIX + Jwts.builder()
+                .subject(String.valueOf(userId))
+                .claim("name", name)
                 .claim("email", email)
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + TOKEN_TIME))
