@@ -18,8 +18,8 @@ public class LoginController {
     @PostMapping
     public ResponseEntity<LoginResponseDto> loginApi(@Valid @RequestBody LoginRequestDto request) {
 
-        LoginResponseDto result = loginService.login(request);
+        String token = loginService.login(request);
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(new LoginResponseDto(token));
     }
 }

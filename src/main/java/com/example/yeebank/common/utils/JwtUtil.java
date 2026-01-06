@@ -44,10 +44,9 @@ public class JwtUtil {
 
 
     // 토큰 생성
-    public String generateToken(Long userId, String name, String email) {
+    public String generateToken(String name, String email) {
         Date now = new Date();
         return BEARER_PREFIX + Jwts.builder()
-                .subject(String.valueOf(userId))
                 .claim("name", name)
                 .claim("email", email)
                 .issuedAt(now)
@@ -74,6 +73,10 @@ public class JwtUtil {
     // 토큰 복호화
     private Claims extractAllClaims(String token) {
         return parser.parseSignedClaims(token).getPayload();
+    }
+
+    public String extractName(String token) {
+        return extractAllClaims(token).get("name", String.class);
     }
 
     public String extractEmail(String token) {

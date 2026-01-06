@@ -1,7 +1,6 @@
 package com.example.yeebank.common.auth.service;
 
 import com.example.yeebank.common.auth.dto.request.LoginRequestDto;
-import com.example.yeebank.common.auth.dto.response.LoginResponseDto;
 import com.example.yeebank.common.utils.JwtUtil;
 import com.example.yeebank.domain.user.entity.User;
 import com.example.yeebank.domain.user.repository.UserRepository;
@@ -17,17 +16,18 @@ public class LoginService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
-    public LoginResponseDto login(LoginRequestDto request) {
-        User user = userRepository.findUserByEmailAndIsDeletedFalse(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("이메일 혹은 비밀번호가 일치하지 않습니다."));
-        boolean matchPassword = passwordEncoder.matches(request.getPassword(), user.getPassword());
+    public String login(LoginRequestDto request) {
 
-        if(!matchPassword) {
+        String email = request.getEmail();
+        String password = request.getPassword();
+
+        User user = userRepository.findUserByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new IllegalArgumentException("이메일 혹은 비밀번호가 일치하지 않습니다."));
+
+        if(!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("이메일 혹은 비밀번호가 일치하지 않습니다.");
         }
 
-        String token = jwtUtil.generateToken(user.getId(), user.getName(), user.getEmail());
-
-        return new LoginResponseDto(token);
+        return jwtUtil.generateToken(user.getName(), user.getEmail());
     }
 }

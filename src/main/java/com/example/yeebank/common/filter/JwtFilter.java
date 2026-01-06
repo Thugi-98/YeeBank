@@ -26,9 +26,15 @@ public class JwtFilter extends OncePerRequestFilter {
         throws ServletException, IOException {
 
         // 토큰을 발급받는 로그인의 경우에는 토큰 검사를 하지 않아도 통과
+        String requestMethod = request.getMethod();
         String requestURL = request.getRequestURI();
 
-        if(requestURL.equals("/api/user/login")) {
+        if(requestURL.equals("/api/users") && requestMethod.equals("POST")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if(requestURL.equals("/api/login")) {
             filterChain.doFilter(request, response);
             return;
         }
