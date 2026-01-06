@@ -2,11 +2,13 @@ package com.example.yeebank.domain.account.entity;
 
 import com.example.yeebank.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -18,12 +20,11 @@ public class Account extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 임의로 String으로 지정했습니다! 편한 타입으로 변경하셔도 됩니다
-    @Column(length = 32, nullable = false)
-    private String account_number;
-
     @Column(nullable = false)
-    private Long password;
+    private Long userId;
+
+    @Column(length = 32, nullable = false, unique = true)
+    private String accountNumber;
 
     @Column(length = 50, nullable = false)
     private String alias;
@@ -31,4 +32,41 @@ public class Account extends BaseEntity {
     @Column(nullable = false)
     private Long balance;
 
+//    @Column(length = 50, nullable = false)
+//    private String name;
+//
+//    @Column(length = 320, unique = true, nullable = false)
+//    private String email;
+
+    @Column(nullable = false)
+    private Long password;
+
+//    @Column(nullable = false)
+//    private Boolean isDeleted;
+
+    @Builder
+    public Account(Long userId,
+                   String accountNumber,
+                   Long password,
+                   String alias,
+                   Long balance) {
+
+        this.userId = userId;
+        this.accountNumber = accountNumber;
+        this.password = password;
+        this.alias = alias;
+        this.balance = balance;
+
+    }
+    // 별칭 업데이트 메서드
+    public void updateAlias(@NotBlank(message = "계좌 별칭은 필수입니다") @Size(max = 50, message = "별칭은 50자 이하여야 합니다") String alias) {
+        this.alias = alias;
+    }
 }
+
+//    @Column
+//    private Boolean isDeleted = false;
+//
+//    @Column
+//    private LocalDateTime deletedAt;
+
