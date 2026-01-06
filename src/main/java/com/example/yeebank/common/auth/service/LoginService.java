@@ -1,7 +1,7 @@
 package com.example.yeebank.common.auth.service;
 
 import com.example.yeebank.common.auth.dto.request.LoginRequestDto;
-import com.example.yeebank.common.utils.JwtUtil;
+import com.example.yeebank.common.security.JwtUtil;
 import com.example.yeebank.domain.user.entity.User;
 import com.example.yeebank.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

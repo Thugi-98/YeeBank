@@ -1,6 +1,5 @@
-package com.example.yeebank.common.config;
+package com.example.yeebank.common.security;
 
-import com.example.yeebank.common.filter.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package com.example.yeebank.common.utils;
+package com.example.yeebank.common.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -75,11 +75,7 @@ public class JwtUtil {
         return parser.parseSignedClaims(token).getPayload();
     }
 
-    public String extractName(String token) {
-        return extractAllClaims(token).get("name", String.class);
-    }
-
-    public String extractEmail(String token) {
+    public String extractUsername(String token) {
         return extractAllClaims(token).get("email", String.class);
     }
 
