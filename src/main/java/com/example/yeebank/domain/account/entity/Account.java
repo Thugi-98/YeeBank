@@ -1,6 +1,6 @@
 package com.example.yeebank.domain.account.entity;
 
-import com.example.yeebank.common.entity.BaseEntity;
+import com.example.yeebank.common.entity.config.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

@@ -1,4 +1,4 @@
-package com.example.yeebank.common.entity;
+package com.example.yeebank.common.entity.config;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
