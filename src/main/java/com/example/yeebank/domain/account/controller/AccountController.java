@@ -7,7 +7,6 @@ import com.example.yeebank.domain.account.dto.response.*;
 import com.example.yeebank.domain.account.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@Slf4j
 @RequestMapping("/api/accounts")
 public class AccountController {
 
@@ -29,7 +27,6 @@ public class AccountController {
     @PostMapping
     public ResponseEntity<ApiResponse<AccountCreateResponse>> createAccountApi(@RequestHeader("X-User-Id") Long userId,
                                                                                @Valid @RequestBody AccountCreateRequest request) {
-        log.info("계좌 생성 요청 - userId: {}, alias: {}", userId, request.getAlias());
         // 1. 서비스 호출
         AccountCreateResponse responseDto = accountService.createAccount(userId, request);
 
@@ -48,7 +45,6 @@ public class AccountController {
     public ResponseEntity<ApiResponse<AccountDetailResponse>> getAccountApi(@PathVariable Long accountId,
                                                                             @RequestAttribute Long userId,
                                                                             @RequestHeader("X-Account-Password") Long password) {
-        log.info("계좌 단건조회 요청 - userId: {}, accountId: {}", userId, accountId);
 
         // 1. 서비스 호출
         AccountDetailResponse responseDto = accountService.getAccount(accountId, userId, password);
@@ -66,7 +62,6 @@ public class AccountController {
      */
     @GetMapping
     public ResponseEntity<ApiResponse<List<AccountAllResponse>>> getAccountListApi(@RequestAttribute Long userId) {
-        log.info("계좌 다건조회 요청 - userId: {}", userId);
 
         // 1. 서비스 호출
         List<AccountAllResponse> responseDto = accountService.getAccountList(userId);
@@ -88,8 +83,6 @@ public class AccountController {
                                                                                @RequestAttribute Long userId,
                                                                                @Valid @RequestBody AccountUpdateRequest request
     ) {
-        log.info("계좌 수정 요청 - accountId: {}, userId: {}, alias: {}",
-                accountId, userId, request.getAlias());
 
         // 1. 서비스 호출
         AccountUpdateResponse responseDto =
@@ -112,7 +105,6 @@ public class AccountController {
     public ResponseEntity<ApiResponse<Void>> deleteAccountApi(@PathVariable Long accountId,
                                                               @RequestAttribute Long userId,
                                                               @Valid @RequestBody AccountDeleteRequest request) {
-        log.info("계좌 삭제 요청 - accountId: {}, userId: {}, password: {}", accountId, userId, request.getPassword());
 
         // 1. 서비스 호출
         accountService.deleteAccount(accountId, userId, request.getPassword());

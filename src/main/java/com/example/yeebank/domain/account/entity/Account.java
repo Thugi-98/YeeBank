@@ -26,7 +26,7 @@ public class Account extends BaseEntity {
     @Column(length = 32, nullable = false, unique = true)
     private String accountNumber;
 
-    @Column(length = 50, nullable = false, unique = true)
+    @Column(length = 50, nullable = false)
     private String alias;
 
     @Column(nullable = false)
