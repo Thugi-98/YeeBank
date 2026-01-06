@@ -2,6 +2,8 @@ package com.example.yeebank.domain.account.entity;
 
 import com.example.yeebank.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,6 +57,10 @@ public class Account extends BaseEntity {
         this.alias = alias;
         this.balance = balance;
 
+    }
+    // 별칭 업데이트 메서드
+    public void updateAlias(@NotBlank(message = "계좌 별칭은 필수입니다") @Size(max = 50, message = "별칭은 50자 이하여야 합니다") String alias) {
+        this.alias = alias;
     }
 }
 

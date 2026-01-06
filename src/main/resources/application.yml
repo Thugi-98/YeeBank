@@ -1,13 +1,13 @@
 spring:
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    url: jdbc:mysql://localhost:3306/yeebank # DB_URL 값 직접 입력
+    username: root                          # DB_USER 값 직접 입력
+    password: 12345678                      # DB_PASSWORD 값 직접 입력 (여기에 입력하세요)
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
