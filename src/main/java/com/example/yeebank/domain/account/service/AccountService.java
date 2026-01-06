@@ -10,7 +10,6 @@ import com.example.yeebank.domain.account.entity.Account;
 import com.example.yeebank.domain.account.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -167,7 +166,7 @@ public class AccountService {
         }
 
         // 5. 소프트 딜리트
-        account.softDelete();
+        account.delete();
 
     }
 
