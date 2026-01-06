@@ -27,7 +27,7 @@ public class AccountController {
      * 계좌 생성
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<AccountCreateResponse>> createAccountApi(@RequestAttribute Long userId,
+    public ResponseEntity<ApiResponse<AccountCreateResponse>> createAccountApi(@RequestHeader("X-User-Id") Long userId,
                                                                                @Valid @RequestBody AccountCreateRequest request) {
         log.info("계좌 생성 요청 - userId: {}, alias: {}", userId, request.getAlias());
         // 1. 서비스 호출
