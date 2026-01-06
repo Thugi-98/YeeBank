@@ -10,6 +10,7 @@ import com.example.yeebank.domain.account.entity.Account;
 import com.example.yeebank.domain.account.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import java.util.Random;
 public class AccountService {
 
     private final AccountRepository accountRepository;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     /**
      * 계좌 생성
@@ -37,11 +39,14 @@ public class AccountService {
         // 2. 계좌번호 생성
         String accountNumber = generateAccountNumber();
 
-        // 2. Entity 생성
+        // 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+
+        // Entity 생성
         Account account = Account.builder()
                 .userId(userId)
                 .accountNumber(accountNumber)
-                .password(request.getPassword())
+                .password(encodedPassword)
                 .alias(request.getAlias())
                 .balance(0L)
                 .build();
@@ -69,7 +74,7 @@ public class AccountService {
     /**
      * 계좌 상세조회
      */
-    public AccountDetailResponse getAccount(Long accountId, Long userId, Long password) {
+    public AccountDetailResponse getAccount(Long accountId, Long userId, String password) {
         // 1. 계좌 조회 (소프트 딜리트 제외)
         Account account = accountRepository.findByIdAndIsDeletedFalse(accountId)
                 .orElseThrow(() -> new RuntimeException("계좌를 찾을 수 없습니다"));
@@ -80,7 +85,7 @@ public class AccountService {
         }
 
         // 3. 비밀번호 일치여부 검증
-        if (!account.getPassword().equals(password)) {
+        if (!account.getPassword().matches(password)) {
             throw new RuntimeException("계좌 비밀번호가 일치하지 않습니다.");
         }
 
@@ -126,7 +131,7 @@ public class AccountService {
             }
         }
         // 4. 비밀번호 검증
-        if (!account.getPassword().equals(request.getPassword())) {
+        if (!account.getPassword().matches(request.getPassword())) {
             throw new RuntimeException("계좌 비밀번호가 일치하지 않습니다.");
         }
 
@@ -141,7 +146,7 @@ public class AccountService {
      * 계좌 삭제(소프트 딜리트)
      */
     @Transactional
-    public void deleteAccount(Long accountId, Long userId, Long password) {
+    public void deleteAccount(Long accountId, Long userId, String password) {
         // 1. 계좌 조회
         Account account = accountRepository.findByIdAndIsDeletedFalse(accountId)
                 .orElseThrow(() -> new RuntimeException("계좌를 찾을 수 없습니다"));
@@ -152,7 +157,7 @@ public class AccountService {
         }
 
         // 3. 비밀번호 일치여부 검증
-        if (!account.getPassword().equals(password)) {
+        if (!account.getPassword().matches(password)) {
             throw new RuntimeException("계좌 비밀번호가 일치하지 않습니다.");
         }
 
