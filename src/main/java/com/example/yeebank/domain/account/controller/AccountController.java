@@ -47,7 +47,7 @@ public class AccountController {
     @GetMapping("/{accountId}")
     public ResponseEntity<ApiResponse<AccountDetailResponse>> getAccountApi(@PathVariable Long accountId,
                                                                             @RequestAttribute Long userId,
-                                                                            @RequestHeader("X-Account-Password") String password) {
+                                                                            @RequestHeader("X-Account-Password") Long password) {
         log.info("계좌 단건조회 요청 - userId: {}, accountId: {}", userId, accountId);
 
         // 1. 서비스 호출

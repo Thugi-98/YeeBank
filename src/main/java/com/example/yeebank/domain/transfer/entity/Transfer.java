@@ -1,6 +1,6 @@
 package com.example.yeebank.domain.transfer.entity;
 
-import com.example.yeebank.common.entity.config.BaseEntity;
+import com.example.yeebank.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

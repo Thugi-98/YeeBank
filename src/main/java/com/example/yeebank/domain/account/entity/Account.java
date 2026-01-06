@@ -1,6 +1,6 @@
 package com.example.yeebank.domain.account.entity;
 
-import com.example.yeebank.common.entity.config.BaseEntity;
+import com.example.yeebank.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -39,7 +39,7 @@ public class Account extends BaseEntity {
 //    private String email;
 
     @Column(nullable = false)
-    private String password;
+    private Long password;
 
 //    @Column(nullable = false)
 //    private Boolean isDeleted;
@@ -47,7 +47,7 @@ public class Account extends BaseEntity {
     @Builder
     public Account(Long userId,
                    String accountNumber,
-                   String password,
+                   Long password,
                    String alias,
                    Long balance) {
 

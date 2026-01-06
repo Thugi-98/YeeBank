@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class AccountDeleteRequest {
 
     @NotNull(message = "비밀번호는 필수입니다")
-    private String password;
+    private Long password;
 }
