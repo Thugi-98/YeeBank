@@ -1,5 +1,6 @@
 package com.example.yeebank.common.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AccessLevel;
@@ -23,4 +24,13 @@ public class BaseEntity {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    @Column
+    private Boolean isDeleted = false;
+
+    @Column
+    private LocalDateTime deletedAt;
+
+    public void delete() {
+        this.isDeleted = true;
+    }
 }
