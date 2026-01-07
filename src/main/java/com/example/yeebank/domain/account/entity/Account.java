@@ -39,7 +39,7 @@ public class Account extends BaseEntity {
 //    private String email;
 
     @Column(nullable = false)
-    private Long password;
+    private String password;
 
 //    @Column(nullable = false)
 //    private Boolean isDeleted;
@@ -47,7 +47,7 @@ public class Account extends BaseEntity {
     @Builder
     public Account(Long userId,
                    String accountNumber,
-                   Long password,
+                   String password,
                    String alias,
                    Long balance) {
 
