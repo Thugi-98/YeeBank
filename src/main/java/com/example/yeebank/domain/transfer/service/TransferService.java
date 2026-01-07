@@ -1,5 +1,6 @@
 package com.example.yeebank.domain.transfer.service;
 
+import com.example.yeebank.common.redis.LockService;
 import com.example.yeebank.domain.account.entity.Account;
 import com.example.yeebank.domain.account.repository.AccountRepository;
 import com.example.yeebank.domain.account.service.AccountService;
@@ -19,15 +20,16 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class TransferService {
 // - Properties
     private final TransferRepository transferRepository;
     private final AccountRepository accountRepository;
     private final AccountService accountService;
+    private final LockService lockService;
 
     // - Methods
+    @Transactional
     public TransferDto Deposit(Long toAccountId, Long amount) {
         // - Found Account
         Account toAccount = accountRepository.findById(toAccountId)
@@ -52,6 +54,7 @@ public class TransferService {
         return TransferDto.from(newRecord);
     }
 
+    @Transactional
     public TransferDto Withdrawal(Long fromAccountId, Long amount) {
         // - Found Account
         Account fromAccount = accountRepository.findById(fromAccountId)
@@ -83,6 +86,7 @@ public class TransferService {
         return TransferDto.from(newRecord);
     }
 
+    @Transactional
     public TransferDto Remittance(Long fromAccountId, Long toAccountId, Long amount) {
         // - Found Account
         Account toAccount = accountRepository.findById(toAccountId)

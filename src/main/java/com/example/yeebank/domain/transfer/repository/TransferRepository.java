@@ -9,6 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface TransferRepository extends JpaRepository<Transfer, Long> {
 // - Methods
-    @Query("SELECT t FROM Transfer t ORDER BY t.craetedAt")
+    @Query("SELECT t FROM Transfer t ORDER BY t.createdAt")
     Page<TransferDto> findAllfromDto(Pageable pageable);
 }

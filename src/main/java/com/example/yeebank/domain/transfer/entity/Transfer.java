@@ -1,10 +1,7 @@
 package com.example.yeebank.domain.transfer.entity;
 
-import com.example.yeebank.common.entity.BaseEntity;
 import com.example.yeebank.domain.transfer.enums.TransferStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -17,7 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "transfers")
 @Getter
 @NoArgsConstructor
-public class Transfer extends BaseEntity {
+public class Transfer {
 // - Properties
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,7 +31,7 @@ public class Transfer extends BaseEntity {
     @Column(name = "request_client_id")
     private Long requestClientId;
     @Column(name = "create_at") @CreatedDate
-    private LocalDateTime craetedAt;
+    private LocalDateTime createdAt;
 
 // - Methods
     public Transfer(Long fromAccountId, Long toAccountId, Long amount, TransferStatus status, String failReason, Long requestClientId) {

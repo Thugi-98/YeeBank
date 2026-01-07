@@ -31,7 +31,7 @@ public class TransferDto {
                 transfer.getStatus(),
                 transfer.getFailReason(),
                 transfer.getRequestClientId(),
-                transfer.getCraetedAt()
+                transfer.getCreatedAt()
         );
     }
 }
