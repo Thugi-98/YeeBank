@@ -109,6 +109,6 @@ public class TransferService {
     }
 
     public Page<TransferDto> GetAll(Pageable pageable) {
-        return transferRepository.findAll(pageable).map(TransferDto::from);
+        return transferRepository.findAllfromDto(pageable);
     }
 }
