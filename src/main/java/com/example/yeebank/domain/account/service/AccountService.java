@@ -15,10 +15,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 import java.util.Random;
 
 @Service
@@ -28,7 +27,7 @@ import java.util.Random;
 public class AccountService {
 
     private final AccountRepository accountRepository;
-//    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 계좌 생성
@@ -43,14 +42,14 @@ public class AccountService {
         // 2. 계좌번호 생성
         String accountNumber = generateAccountNumber();
 
-//        // 비밀번호 암호화
-//        String encodedPassword = passwordEncoder.encode(request.getPassword());
+       // 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
 
         // Entity 생성
         Account account = Account.builder()
                 .userId(userId)
                 .accountNumber(accountNumber)
-                .password(request.getPassword())
+                .password(encodedPassword)
                 .alias(request.getAlias())
                 .balance(0L)
                 .build();
@@ -89,7 +88,7 @@ public class AccountService {
         }
 
         // 3. 비밀번호 일치여부 검증
-        if (!account.getPassword().equals(password)) {
+        if (!passwordEncoder.matches(password,account.getPassword())) {
             throw new RuntimeException("계좌 비밀번호가 일치하지 않습니다.");
         }
 
@@ -137,7 +136,7 @@ public class AccountService {
             }
         }
         // 4. 비밀번호 검증
-        if (!account.getPassword().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(),account.getPassword())) {
             throw new RuntimeException("계좌 비밀번호가 일치하지 않습니다.");
         }
 
@@ -163,7 +162,7 @@ public class AccountService {
         }
 
         // 3. 비밀번호 일치여부 검증
-        if (!account.getPassword().equals(password)) {
+        if (!passwordEncoder.matches(password,account.getPassword())) {
             throw new RuntimeException("계좌 비밀번호가 일치하지 않습니다.");
         }
 
