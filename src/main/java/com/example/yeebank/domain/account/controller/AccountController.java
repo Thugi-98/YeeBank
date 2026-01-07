@@ -1,5 +1,7 @@
 package com.example.yeebank.domain.account.controller;
 
+import com.example.yeebank.common.dto.CommonResponse;
+import com.example.yeebank.common.dto.PageResponse;
 import com.example.yeebank.domain.account.dto.request.AccountCreateRequest;
 import com.example.yeebank.domain.account.dto.request.AccountDeleteRequest;
 import com.example.yeebank.domain.account.dto.request.AccountUpdateRequest;
@@ -7,6 +9,8 @@ import com.example.yeebank.domain.account.dto.response.*;
 import com.example.yeebank.domain.account.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +48,7 @@ public class AccountController {
     @GetMapping("/{accountId}")
     public ResponseEntity<ApiResponse<AccountDetailResponse>> getAccountApi(@PathVariable Long accountId,
                                                                             @RequestAttribute Long userId,
-                                                                            @RequestHeader("X-Account-Password") Long password) {
+                                                                            @RequestHeader("X-Account-Password") String password) {
 
         // 1. 서비스 호출
         AccountDetailResponse responseDto = accountService.getAccount(accountId, userId, password);
@@ -58,19 +62,21 @@ public class AccountController {
     }
 
     /**
-     * 계좌 목록조회
+     * 계좌 목록조회 -> 페이징 적용
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<List<AccountAllResponse>>> getAccountListApi(@RequestAttribute Long userId) {
+    public ResponseEntity<CommonResponse<PageResponse<AccountAllResponse>>> getAccountListApi(@RequestAttribute Long userId,
+                                  @RequestParam(defaultValue = "0") int page,
+                                  @RequestParam(defaultValue = "10") int size) {
 
-        // 1. 서비스 호출
-        List<AccountAllResponse> responseDto = accountService.getAccountList(userId);
+        // 1. 서비스 호출(페이징)
+        PageResponse<AccountAllResponse> accountAllResponsePage = accountService.getAccountList(userId, page, size);
 
-        // 2. Api 래퍼 생성
-        ApiResponse<List<AccountAllResponse>> apiResponse = new ApiResponse<>(true, "계좌 목록 조회 성공", responseDto, LocalDateTime.now());
+        // 2. 공통 응답 생성
+        CommonResponse<PageResponse<AccountAllResponse>> commonResponse = CommonResponse.success(accountAllResponsePage,"계좌 목록 조회 성공.");
 
-        // 3. ResponseEntity 생성
-        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        // 3. 응답 반환
+        return ResponseEntity.ok(commonResponse);
 
 
     }

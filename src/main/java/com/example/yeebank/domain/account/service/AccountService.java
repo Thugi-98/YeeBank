@@ -1,5 +1,6 @@
 package com.example.yeebank.domain.account.service;
 
+import com.example.yeebank.common.dto.PageResponse;
 import com.example.yeebank.domain.account.dto.request.AccountCreateRequest;
 import com.example.yeebank.domain.account.dto.request.AccountUpdateRequest;
 import com.example.yeebank.domain.account.dto.response.AccountAllResponse;
@@ -10,6 +11,10 @@ import com.example.yeebank.domain.account.entity.Account;
 import com.example.yeebank.domain.account.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,7 +78,7 @@ public class AccountService {
     /**
      * 계좌 상세조회
      */
-    public AccountDetailResponse getAccount(Long accountId, Long userId, Long password) {
+    public AccountDetailResponse getAccount(Long accountId, Long userId, String password) {
         // 1. 계좌 조회 (소프트 딜리트 제외)
         Account account = accountRepository.findByIdAndIsDeletedFalse(accountId)
                 .orElseThrow(() -> new RuntimeException("계좌를 찾을 수 없습니다"));
@@ -93,18 +98,20 @@ public class AccountService {
     }
 
     /**
-     * 계좌 목록조회
+     * 계좌 목록조회 -> 페이징 적용
      */
-    public List<AccountAllResponse> getAccountList(Long userId) {
-        log.info("계좌 목록 조회 - userId: {}", userId);
+    public PageResponse<AccountAllResponse> getAccountList(Long userId, int page, int size) {
+        log.info("계좌 목록 조회 - userId: {}, page: {}, size: {}", userId, page, size);
+        // 1. Pageable 생성 (최신순 정렬)
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        // 1. 계좌 목록 조회
-        List<Account> accountList = accountRepository.findAllByUserIdAndIsDeletedFalse(userId);
+        // 2. 페이징 조회
+        Page<Account> accountPage = accountRepository.findAllByUserIdAndIsDeletedFalse(userId, pageable);
 
-        // 2. Response DTO로 변환
-        return accountList.stream()
-                .map(AccountAllResponse::from)
-                .toList();
+        // 3. Response DTO로 변환
+        Page<AccountAllResponse> responsePage = accountPage.map(AccountAllResponse::from);
+        return PageResponse.from(responsePage);
+
     }
 
     /**
@@ -145,7 +152,7 @@ public class AccountService {
      * 계좌 삭제(소프트 딜리트)
      */
     @Transactional
-    public void deleteAccount(Long accountId, Long userId, Long password) {
+    public void deleteAccount(Long accountId, Long userId, String password) {
         // 1. 계좌 조회
         Account account = accountRepository.findByIdAndIsDeletedFalse(accountId)
                 .orElseThrow(() -> new RuntimeException("계좌를 찾을 수 없습니다"));
