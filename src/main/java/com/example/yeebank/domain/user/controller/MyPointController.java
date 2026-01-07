@@ -72,8 +72,7 @@ public class MyPointController {
      * 포인트 조회 API
      */
     @GetMapping("/{userId}")
-    public ResponseEntity<CommonResponse<UserPointGetMyPointResponseDto>
-            > getPointApi(
+    public ResponseEntity<CommonResponse<UserPointGetMyPointResponseDto>> getPointApi(
             @PathVariable("userId") Long userId
     ) {
         UserPointGetMyPointResponseDto responseDto = myPointService.getMyPoint(userId);
