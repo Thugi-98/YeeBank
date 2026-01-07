@@ -1,5 +1,6 @@
 package com.example.yeebank.domain.user.controller;
 
+import com.example.yeebank.common.dto.CommonResponse;
 import com.example.yeebank.domain.user.dto.request.UserPointEarnPointRequestDto;
 import com.example.yeebank.domain.user.dto.request.UserPointUsePointRequestDto;
 import com.example.yeebank.domain.user.dto.response.UserPointAttendancePointResponseDto;
@@ -26,58 +27,58 @@ public class MyPointController {
      * 포인트 적립 API
      */
     @PostMapping("/{userId}")
-    public ResponseEntity<UserPointEarnPointResponseDto> earnPointApi(
+    public ResponseEntity<CommonResponse<UserPointEarnPointResponseDto>> earnPointApi(
             @PathVariable("userId") Long userId,
             @RequestBody UserPointEarnPointRequestDto requestDto
     ) {
         UserPointEarnPointResponseDto responseDto = myPointService.earnPoint(userId, requestDto);
 
-        ResponseEntity<UserPointEarnPointResponseDto> response = new ResponseEntity<>(responseDto, HttpStatus.OK);
+        CommonResponse<UserPointEarnPointResponseDto> commonResponse = new CommonResponse<>(true, "포인트 적립 완료", responseDto);
 
-        return response;
+        return new ResponseEntity<>(commonResponse, HttpStatus.OK);
     }
 
     /**
      * 출석체크 포인트 적립 API
      */
     @PostMapping("/{userId}/attendance")
-    public ResponseEntity<UserPointAttendancePointResponseDto> attendancePointApi(
+    public ResponseEntity<CommonResponse<UserPointAttendancePointResponseDto>> attendancePointApi(
             @PathVariable("userId") Long userId,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate attendanceDate
     ) {
         UserPointAttendancePointResponseDto responseDto = myPointService.attendancePoint(userId, attendanceDate);
 
-        ResponseEntity<UserPointAttendancePointResponseDto> response = new ResponseEntity<>(responseDto, HttpStatus.OK);
+        CommonResponse<UserPointAttendancePointResponseDto> commonResponse = new CommonResponse<>(true, "출석체크 완료", responseDto);
 
-        return response;
+        return new ResponseEntity<>(commonResponse, HttpStatus.OK);
     }
 
     /**
      * 포인트 사용 API
      */
     @PutMapping("/{userId}")
-    public ResponseEntity<UserPointUsePointResponseDto> usePointApi(
+    public ResponseEntity<CommonResponse<UserPointUsePointResponseDto>> usePointApi(
             @PathVariable("userId") Long userId,
             @RequestBody UserPointUsePointRequestDto requestDto
     ) {
         UserPointUsePointResponseDto responseDto = myPointService.usePoint(userId, requestDto);
 
-        ResponseEntity<UserPointUsePointResponseDto> response = new ResponseEntity<>(responseDto, HttpStatus.OK);
+        CommonResponse<UserPointUsePointResponseDto> commonResponse = new CommonResponse<>(true, "포인트 사용 완료", responseDto);
 
-        return response;
+        return new ResponseEntity<>(commonResponse, HttpStatus.OK);
     }
 
     /**
      * 포인트 조회 API
      */
     @GetMapping("/{userId}")
-    public ResponseEntity<UserPointGetMyPointResponseDto> getPointApi(
+    public ResponseEntity<CommonResponse<UserPointGetMyPointResponseDto>> getPointApi(
             @PathVariable("userId") Long userId
     ) {
         UserPointGetMyPointResponseDto responseDto = myPointService.getMyPoint(userId);
 
-        ResponseEntity<UserPointGetMyPointResponseDto> response = new ResponseEntity<>(responseDto, HttpStatus.OK);
+        CommonResponse<UserPointGetMyPointResponseDto> commonResponse = new CommonResponse<>(true, "포인트 조회 완료", responseDto);
 
-        return response;
+        return new ResponseEntity<>(commonResponse, HttpStatus.OK);
     }
 }

@@ -1,5 +1,7 @@
 package com.example.yeebank.domain.user.service;
 
+import com.example.yeebank.common.exception.CustomException;
+import com.example.yeebank.common.exception.ErrorCode;
 import com.example.yeebank.domain.user.dto.dto.UserDto;
 import com.example.yeebank.domain.user.dto.request.UserCreateRequestDto;
 import com.example.yeebank.domain.user.dto.request.UserUpdateRequestDto;
@@ -10,12 +12,12 @@ import com.example.yeebank.domain.user.dto.response.UserUpdateResponseDto;
 import com.example.yeebank.domain.user.entity.User;
 import com.example.yeebank.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ public class UserService {
         Boolean existEmail = userRepository.existsByEmail(requestDto.getEmail());
 
         if (existEmail) {
-            throw new RuntimeException("중복된 이메일");
+            throw new CustomException(ErrorCode.USER_DUPLICATE_EMAIL);
         }
 
         String encodePassword = passwordEncoder.encode(requestDto.getPassword());
@@ -57,7 +59,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserGetDetailResponseDto getDetailUser(Long userId) {
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         UserDto responseDto = UserDto.from(findUser);
 
@@ -68,38 +70,37 @@ public class UserService {
      * 유저 전체조회 로직
      */
     @Transactional(readOnly = true)
-    public UserGetAllResponseDto getAllUser() {
-        List<User> findUserList = userRepository.findUsersByIsDeletedFalse();
+    public Page<UserGetAllResponseDto> getAllUser(Integer page, Integer size) {
 
-        Integer count = findUserList.size();
+        Pageable pageable = PageRequest.of(page, size);
 
-        List<UserGetAllResponseDto.UserListResponseDto> dtoList = new ArrayList<>();
+        Page<UserDto> findUserList = userRepository.findAllByIsDeletedFalse(pageable);
 
-        for (User user : findUserList) {
-            UserGetAllResponseDto.UserListResponseDto dto = UserGetAllResponseDto.UserListResponseDto.from(UserDto.from(user));
-            dtoList.add(dto);
-        }
+        Page<UserGetAllResponseDto> responseDtoPage = findUserList.map(UserGetAllResponseDto::from);
 
-        return new UserGetAllResponseDto(count, dtoList);
+        return responseDtoPage;
     }
 
     /**
-     * 유저 정보 수정 로직
+     * 유저 정보(이메일) 수정 로직
      */
     @Transactional
     public UserUpdateResponseDto updateUser(Long userId, UserUpdateRequestDto requestDto) {
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Boolean existEmail = userRepository.existsByEmail(requestDto.getEmail());
+
+        if (existEmail) {
+            throw new CustomException(ErrorCode.USER_DUPLICATE_EMAIL);
+        }
 
         findUser.updateUser(
-                requestDto.getName(),
-                requestDto.getEmail(),
-                requestDto.getPassword()
+                requestDto.getEmail()
         );
 
         if (!passwordEncoder.matches(requestDto.getPassword(), findUser.getPassword())) {
-            // 400
-            throw new RuntimeException("비밀번호가 일치하지 않습니다");
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
         UserDto responseDto = UserDto.from(findUser);
@@ -113,7 +114,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Long userId) {
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         findUser.delete();
     }

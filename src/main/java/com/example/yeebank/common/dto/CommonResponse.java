@@ -13,25 +13,25 @@ public class CommonResponse<T> {
     private final LocalDateTime timestamp; // 실행 시간
     private final T data;                  // 성공 시 data , 실패시 null
 
-    private CommonResponse(boolean success, String message, T data, LocalDateTime timestamp) {
+    public CommonResponse(boolean success, String message, T data) {
         this.success = success;
         this.message = message;
         this.data = data;
-        this.timestamp = timestamp;
+        this.timestamp = LocalDateTime.now();
     }
 
     // 성공시 공용 응답 객체
     public static <T> CommonResponse<T> success(T data, String message) {
-        return new CommonResponse<>(true, message, data, LocalDateTime.now());
+        return new CommonResponse<>(true, message, data);
     }
 
     // 실패시 공용 응답 객체
     public static <T> CommonResponse<T> fail(ErrorCode errorCode) {
-        return new CommonResponse<>(false, errorCode.getMessage(), null, LocalDateTime.now());
+        return new CommonResponse<>(false, errorCode.getMessage(), null);
     }
 
     public static <T> CommonResponse<T> fail(String message) {
-        return new CommonResponse<>(false, message, null, LocalDateTime.now());
+        return new CommonResponse<>(false, message, null);
     }
 
     // 메세지를 직접 입력하는 경우
@@ -39,8 +39,7 @@ public class CommonResponse<T> {
         return new CommonResponse<>(
                 false,
                 message,
-                null,
-                LocalDateTime.now()
+                null
         );
     }
 }

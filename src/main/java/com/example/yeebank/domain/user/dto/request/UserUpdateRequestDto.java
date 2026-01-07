@@ -1,16 +1,14 @@
 package com.example.yeebank.domain.user.dto.request;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
 public class UserUpdateRequestDto {
-
-    @Min(value = 1) @Max(value = 50)
-    @NotBlank(message = "이름을 입력해주세요")
-    private String name;
 
     @Email
     @Pattern(

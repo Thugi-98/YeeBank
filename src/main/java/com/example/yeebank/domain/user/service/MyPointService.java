@@ -1,5 +1,7 @@
 package com.example.yeebank.domain.user.service;
 
+import com.example.yeebank.common.exception.CustomException;
+import com.example.yeebank.common.exception.ErrorCode;
 import com.example.yeebank.domain.user.dto.dto.PointDto;
 import com.example.yeebank.domain.user.dto.request.UserPointEarnPointRequestDto;
 import com.example.yeebank.domain.user.dto.request.UserPointUsePointRequestDto;
@@ -28,7 +30,7 @@ public class MyPointService {
     public UserPointEarnPointResponseDto earnPoint(Long userId, UserPointEarnPointRequestDto requestDto) {
 
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         findUser.earnPoint(requestDto.getEarnPoint());
 
@@ -48,12 +50,12 @@ public class MyPointService {
         LocalDate today = LocalDate.now();
 
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         boolean validDate = today.equals(attendanceDate);
 
         if (!validDate) {
-            throw new RuntimeException("출석체크는 오늘만 가능합니다");
+            throw new CustomException(ErrorCode.POINT_NOT_TODAY_ATTENDANCE);
         }
 
         findUser.earnAttendancePoint(today);
@@ -70,7 +72,7 @@ public class MyPointService {
     public UserPointUsePointResponseDto usePoint(Long userId, UserPointUsePointRequestDto requestDto) {
 
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         findUser.usePoint(requestDto.getUsePoint());
 
@@ -86,7 +88,7 @@ public class MyPointService {
     public UserPointGetMyPointResponseDto getMyPoint(Long userId) {
 
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         PointDto pointDto = PointDto.from(findUser, 0, 0);
 
