@@ -20,6 +20,7 @@ public enum ErrorCode {
     USER_DUPLICATE_USERNAME(HttpStatus.CONFLICT, "이미 존재하는 사용자명입니다."),
     USER_DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 사용중인 이메일입니다."),
     USER_ACCESS_DENIED(HttpStatus.FORBIDDEN, "권한이 없습니다."),
+    USER_CONFLICT_PASSWORD(HttpStatus.CONFLICT, "변경 하시려는 비밀번호는 변경 전과 같을 수 없습니다."),
 
     // 포인트 관련 ErrorCode
     POINT_USE_BELOW_MINIUM(HttpStatus.BAD_REQUEST, "사용 가능하신 최소 포인트는 1 포인트 이상 입니다."),
