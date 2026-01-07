@@ -1,5 +1,7 @@
 package com.example.yeebank.domain.user.controller;
 
+import com.example.yeebank.common.dto.CommonResponse;
+import com.example.yeebank.common.dto.PageResponse;
 import com.example.yeebank.domain.user.dto.request.UserCreateRequestDto;
 import com.example.yeebank.domain.user.dto.request.UserUpdateRequestDto;
 import com.example.yeebank.domain.user.dto.response.UserCreateResponseDto;
@@ -9,6 +11,7 @@ import com.example.yeebank.domain.user.dto.response.UserUpdateResponseDto;
 import com.example.yeebank.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,55 +27,57 @@ public class UserController {
      * 유저 회원가입(생성) API
      */
     @PostMapping
-    public ResponseEntity<UserCreateResponseDto> createUserApi(
+    public ResponseEntity<CommonResponse<UserCreateResponseDto>> createUserApi(
             @Valid @RequestBody UserCreateRequestDto requestDto
     ) {
         UserCreateResponseDto responseDto = userService.createUser(requestDto);
 
-        ResponseEntity<UserCreateResponseDto> response = new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+        CommonResponse<UserCreateResponseDto> commonResponse = new CommonResponse<>(true, "회원가입 완료", responseDto);
 
-        return response;
+        return new ResponseEntity<>(commonResponse, HttpStatus.CREATED);
     }
 
     /**
      * 유저 상세조회 API
      */
     @GetMapping("/{userId}")
-    public ResponseEntity<UserGetDetailResponseDto> getDetailUserApi(
+    public ResponseEntity<CommonResponse<UserGetDetailResponseDto>> getDetailUserApi(
             @PathVariable("userId") Long userId
     ) {
         UserGetDetailResponseDto responseDto = userService.getDetailUser(userId);
 
-        ResponseEntity<UserGetDetailResponseDto> response = new ResponseEntity<>(responseDto, HttpStatus.OK);
+        CommonResponse<UserGetDetailResponseDto> commonResponse = new CommonResponse<>(true, "사용자 정보 조회 성공", responseDto);
 
-        return response;
+        return new ResponseEntity<>(commonResponse, HttpStatus.CREATED);
     }
 
     /**
      * 유저 전체조회 API
      */
     @GetMapping
-    public ResponseEntity<UserGetAllResponseDto> getAllUserApi(
+    public ResponseEntity<PageResponse<UserGetAllResponseDto>> getAllUserApi(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size
 
     ) {
-        UserGetAllResponseDto responseDto = userService.getAllUser();
+        Page<UserGetAllResponseDto> responseDto = userService.getAllUser(page, size);
 
-        ResponseEntity<UserGetAllResponseDto> response = new ResponseEntity<>(responseDto, HttpStatus.OK);
-
-        return response;
+        return new ResponseEntity<>(PageResponse.from(responseDto), HttpStatus.OK);
     }
 
     /**
-     * 유저 정보 수정 API
+     * 유저 정보(비밀번호) 수정 API
      */
-    @PutMapping("/{userId}")
-    public ResponseEntity<UserUpdateResponseDto> updateUserApi(
+    @PatchMapping("/{userId}")
+    public ResponseEntity<CommonResponse<UserUpdateResponseDto>> updateUserApi(
             @PathVariable("userId") Long userId,
             @Valid @RequestBody UserUpdateRequestDto requestDto
     ) {
         UserUpdateResponseDto responseDto = userService.updateUser(userId, requestDto);
 
-        ResponseEntity<UserUpdateResponseDto> response = new ResponseEntity<>(responseDto, HttpStatus.OK);
+        CommonResponse<UserUpdateResponseDto> commonResponse = new CommonResponse<>(true, "회원 정보 수정 성공", responseDto);
+
+        ResponseEntity<CommonResponse<UserUpdateResponseDto>> response = new ResponseEntity<>(commonResponse, HttpStatus.OK);
 
         return response;
     }
@@ -86,7 +91,9 @@ public class UserController {
     ) {
         userService.deleteUser(userId);
 
-        ResponseEntity response = new ResponseEntity<>(HttpStatus.OK);
+        CommonResponse commonResponse = new CommonResponse<>(true, "회원 탈퇴 성공", null);
+
+        ResponseEntity response = new ResponseEntity<>(commonResponse, HttpStatus.OK);
 
         return response;
     }

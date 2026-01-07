@@ -17,5 +17,5 @@ public class AccountUpdateRequest {
     private String alias;
 
     @NotNull(message = "비밀번호는 필수입니다")
-    private Long password;
+    private String password;
 }
