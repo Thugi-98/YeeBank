@@ -11,25 +11,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserGetAllResponseDto {
 
-    private final Integer count;
-    private final List<UserListResponseDto> userList;
+    private final Long id;
+    private final String name;
+    private final String email;
+    private final LocalDateTime createdAt;
 
-
-    @Getter
-    @RequiredArgsConstructor
-    public static class UserListResponseDto {
-        private final Long id;
-        private final String name;
-        private final String email;
-        private final LocalDateTime createdAt;
-
-        public static UserListResponseDto from(UserDto dto) {
-            return new UserListResponseDto(
-                    dto.getId(),
-                    dto.getName(),
-                    dto.getEmail(),
-                    dto.getCreateAt()
-            );
-        }
+    public static UserGetAllResponseDto from(UserDto dto) {
+        return new UserGetAllResponseDto(
+                dto.getId(),
+                dto.getName(),
+                dto.getEmail(),
+                dto.getCreatedAt()
+        );
     }
 }

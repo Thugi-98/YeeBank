@@ -21,7 +21,7 @@ public class UserUpdateResponseDto {
                 dto.getId(),
                 dto.getName(),
                 dto.getEmail(),
-                dto.getCreateAt(),
+                dto.getCreatedAt(),
                 dto.getUpdatedAt()
         );
     }

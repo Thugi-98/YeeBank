@@ -12,6 +12,9 @@ import com.example.yeebank.domain.user.dto.response.UserUpdateResponseDto;
 import com.example.yeebank.domain.user.entity.User;
 import com.example.yeebank.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,19 +73,15 @@ public class UserService {
      * 유저 전체조회 로직
      */
     @Transactional(readOnly = true)
-    public UserGetAllResponseDto getAllUser() {
-        List<User> findUserList = userRepository.findUsersByIsDeletedFalse();
+    public Page<UserGetAllResponseDto> getAllUser(Integer page, Integer size) {
 
-        Integer count = findUserList.size();
+        Pageable pageable = PageRequest.of(page, size);
 
-        List<UserGetAllResponseDto.UserListResponseDto> dtoList = new ArrayList<>();
+        Page<UserDto> findUserList = userRepository.findAllByIsDeletedFalse(pageable);
 
-        for (User user : findUserList) {
-            UserGetAllResponseDto.UserListResponseDto dto = UserGetAllResponseDto.UserListResponseDto.from(UserDto.from(user));
-            dtoList.add(dto);
-        }
+        Page<UserGetAllResponseDto> responseDtoPage = findUserList.map(UserGetAllResponseDto::from);
 
-        return new UserGetAllResponseDto(count, dtoList);
+        return responseDtoPage;
     }
 
     /**
