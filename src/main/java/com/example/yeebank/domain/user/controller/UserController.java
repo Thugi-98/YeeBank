@@ -66,7 +66,7 @@ public class UserController {
     }
 
     /**
-     * 유저 정보 수정 API
+     * 유저 정보(비밀번호) 수정 API
      */
     @PatchMapping("/{userId}")
     public ResponseEntity<CommonResponse<UserUpdateResponseDto>> updateUserApi(
