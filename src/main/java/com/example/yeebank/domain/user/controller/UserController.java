@@ -68,7 +68,7 @@ public class UserController {
     /**
      * 유저 정보 수정 API
      */
-    @PutMapping("/{userId}")
+    @PatchMapping("/{userId}")
     public ResponseEntity<CommonResponse<UserUpdateResponseDto>> updateUserApi(
             @PathVariable("userId") Long userId,
             @Valid @RequestBody UserUpdateRequestDto requestDto

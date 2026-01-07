@@ -13,7 +13,7 @@ public class LoginRequestDto {
     @Email
     @Pattern(
             regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
-            message = "이메일 형식이 올바르지 않습니다."
+            message = "이메일 형식이 올바르지 않습니다.")
     @NotBlank(message = "email을 입력해주세요")
     private String email;
 

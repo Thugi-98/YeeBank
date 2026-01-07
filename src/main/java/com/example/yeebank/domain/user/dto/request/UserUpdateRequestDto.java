@@ -8,10 +8,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UserUpdateRequestDto {
 
-    @Min(value = 1) @Max(value = 50)
-    @NotBlank(message = "이름을 입력해주세요")
-    private String name;
-
     @Email
     @Pattern(
             regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",

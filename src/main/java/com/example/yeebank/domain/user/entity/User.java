@@ -41,10 +41,8 @@ public class User extends BaseEntity {
         this.password = password;
     }
 
-    public void updateUser(String name, String email, String password) {
-        this.name = name;
+    public void updateUser(String email) {
         this.email = email;
-        this.password = password;
     }
 
     // 포인트

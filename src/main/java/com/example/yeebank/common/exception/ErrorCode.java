@@ -16,6 +16,7 @@ public enum ErrorCode {
 
     // 유저 관련 ErrorCode
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저가 존재하지 않습니다."),
+    USER_ALREADY_DELETED(HttpStatus.NOT_FOUND, "이미 비활성화 된 유저 입니다."),
     USER_DUPLICATE_USERNAME(HttpStatus.CONFLICT, "이미 존재하는 사용자명입니다."),
     USER_DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 사용중인 이메일입니다."),
     USER_ACCESS_DENIED(HttpStatus.FORBIDDEN, "권한이 없습니다."),

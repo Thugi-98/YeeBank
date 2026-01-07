@@ -82,17 +82,21 @@ public class UserService {
     }
 
     /**
-     * 유저 정보 수정 로직
+     * 유저 정보(이메일) 수정 로직
      */
     @Transactional
     public UserUpdateResponseDto updateUser(Long userId, UserUpdateRequestDto requestDto) {
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+        Boolean existEmail = userRepository.existsByEmail(requestDto.getEmail());
+
+        if (existEmail) {
+            throw new CustomException(ErrorCode.USER_DUPLICATE_EMAIL);
+        }
+
         findUser.updateUser(
-                requestDto.getName(),
-                requestDto.getEmail(),
-                requestDto.getPassword()
+                requestDto.getEmail()
         );
 
         if (!passwordEncoder.matches(requestDto.getPassword(), findUser.getPassword())) {
