@@ -1,5 +1,7 @@
 package com.example.yeebank.domain.user.service;
 
+import com.example.yeebank.common.exception.CustomException;
+import com.example.yeebank.common.exception.ErrorCode;
 import com.example.yeebank.domain.user.dto.dto.UserDto;
 import com.example.yeebank.domain.user.dto.request.UserCreateRequestDto;
 import com.example.yeebank.domain.user.dto.request.UserUpdateRequestDto;
@@ -33,7 +35,7 @@ public class UserService {
         Boolean existEmail = userRepository.existsByEmail(requestDto.getEmail());
 
         if (existEmail) {
-            throw new RuntimeException("중복된 이메일");
+            throw new CustomException(ErrorCode.USER_DUPLICATE_EMAIL);
         }
 
         String encodePassword = passwordEncoder.encode(requestDto.getPassword());
@@ -57,7 +59,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserGetDetailResponseDto getDetailUser(Long userId) {
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         UserDto responseDto = UserDto.from(findUser);
 
@@ -89,7 +91,7 @@ public class UserService {
     @Transactional
     public UserUpdateResponseDto updateUser(Long userId, UserUpdateRequestDto requestDto) {
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         findUser.updateUser(
                 requestDto.getName(),
@@ -98,8 +100,7 @@ public class UserService {
         );
 
         if (!passwordEncoder.matches(requestDto.getPassword(), findUser.getPassword())) {
-            // 400
-            throw new RuntimeException("비밀번호가 일치하지 않습니다");
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
         UserDto responseDto = UserDto.from(findUser);
@@ -113,7 +114,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Long userId) {
         User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         findUser.delete();
     }

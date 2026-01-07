@@ -1,6 +1,8 @@
 package com.example.yeebank.domain.user.entity;
 
 import com.example.yeebank.common.entity.BaseEntity;
+import com.example.yeebank.common.exception.CustomException;
+import com.example.yeebank.common.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -53,7 +55,7 @@ public class User extends BaseEntity {
     public void earnAttendancePoint(LocalDate today) {
 
         if (attendanceAt.equals(today)) {
-            throw new RuntimeException("오늘은 이미 출석체크 완료 되었습니다");
+            throw new CustomException(ErrorCode.POINT_DUPLICATE_ATTENDANCE);
         }
 
         this.attendanceAt = today;
@@ -63,11 +65,11 @@ public class User extends BaseEntity {
     public void usePoint(long usePoint) {
 
         if (usePoint < 1) {
-            throw new RuntimeException("사용가능 하신 포인트는 1 포인트 이상입니다");
+            throw new CustomException(ErrorCode.POINT_USE_BELOW_MINIUM);
         }
 
         if (this.myPoint < usePoint) {
-            throw new RuntimeException("보유하신 포인트가 부족합니다");
+            throw new CustomException(ErrorCode.POINT_USE_NOT_ENOUGH);
         }
 
         this.myPoint -= usePoint;

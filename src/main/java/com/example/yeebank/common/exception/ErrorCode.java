@@ -20,14 +20,22 @@ public enum ErrorCode {
     USER_DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 사용중인 이메일입니다."),
     USER_ACCESS_DENIED(HttpStatus.FORBIDDEN, "권한이 없습니다."),
 
+    // 포인트 관련 ErrorCode
+    POINT_USE_BELOW_MINIUM(HttpStatus.BAD_REQUEST, "사용 가능하신 최소 포인트는 1 포인트 이상 입니다."),
+    POINT_USE_NOT_ENOUGH(HttpStatus.BAD_REQUEST, "보유하신 포인트가 부족합니다"),
+    POINT_NOT_TODAY_ATTENDANCE(HttpStatus.FORBIDDEN, "출석체크를 진행할 수 없습니다."),
+    POINT_DUPLICATE_ATTENDANCE(HttpStatus.CONFLICT, "오늘은 이미 출석체크 완료 되었습니다."),
+
     // 계좌 관련 ErrorCode
     ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "계좌가 존재하지 않습니다."),
     ACCOUNT_DUPLICATE_NUMBER(HttpStatus.CONFLICT, "이미 존재하는 계좌번호입니다."),
 
     // 거래 관련 ErrorCode
     TRANSFER_NOT_FOUND_SEND(HttpStatus.NOT_FOUND, "존재하지 않는 계좌로는 송금을 할 수 없습니다."),
-//    TRANSFER_AMOUNT_MISS(HttpStatus.N , ""), //보유 잔액이 부족할때
-    TRANSFER_CLIENT_MISS(HttpStatus.NOT_FOUND, "요청 클라이언트를 찾을 수 없습니다.");
+    //TRANSFER_AMOUNT_MISS(HttpStatus.N , ""), //보유 잔액이 부족할때
+    TRANSFER_CLIENT_MISS(HttpStatus.NOT_FOUND, "요청 클라이언트를 찾을 수 없습니다.")
+
+    ;
 
     private final HttpStatus status;
     private final String message;
