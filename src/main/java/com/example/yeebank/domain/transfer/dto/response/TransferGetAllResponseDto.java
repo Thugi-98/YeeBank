@@ -2,10 +2,12 @@ package com.example.yeebank.domain.transfer.dto.response;
 
 import com.example.yeebank.domain.transfer.dto.dto.TransferDto;
 import com.example.yeebank.domain.transfer.enums.TransferStatus;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@Getter
 @RequiredArgsConstructor
 public class TransferGetAllResponseDto {
 // - Properties

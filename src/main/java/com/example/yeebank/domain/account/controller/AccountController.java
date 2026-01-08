@@ -82,7 +82,7 @@ public class AccountController {
     /**
      * 계좌 수정
      */
-    @PutMapping("/{accountId}")
+    @PatchMapping("/{accountId}")
     public ResponseEntity<CommonResponse<AccountUpdateResponse>> updateAccountApi(@PathVariable Long accountId, @AuthenticationPrincipal CustomUserDetails user,
                                                                                   @Valid @RequestBody AccountUpdateRequest request
     ) {
@@ -92,7 +92,7 @@ public class AccountController {
 
         // 2. Api 래퍼 생성
         CommonResponse<AccountUpdateResponse> apiResponse =
-                new CommonResponse<>(true, "사용자 정보가 수정되었습니다.", responseDto);
+                new CommonResponse<>(true, "계좌 정보가 수정되었습니다.", responseDto);
 
         // 3. ResponseEntity 생성
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
@@ -131,7 +131,6 @@ public class AccountController {
     public ResponseEntity<CommonResponse<AccountDetailResponse>> withdraw(
             @PathVariable Long accountId,
             @RequestParam Long amount) {
-        accountService.withdrawal(accountId, amount);
         AccountDetailResponse result = accountService.withdrawal(accountId, amount);
         return ResponseEntity.ok(CommonResponse.success(result, "출금 성공"));
     }
