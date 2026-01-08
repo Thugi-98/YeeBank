@@ -17,8 +17,7 @@ public class TransferDto {
     private Long amount;
     private TransferStatus status;
     private String failReason;
-    private Long requestClientId;
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 
 // - Methods
     // - Static Factory Methods
@@ -30,7 +29,6 @@ public class TransferDto {
                 transfer.getAmount(),
                 transfer.getStatus(),
                 transfer.getFailReason(),
-                transfer.getRequestClientId(),
                 transfer.getCreatedAt()
         );
     }

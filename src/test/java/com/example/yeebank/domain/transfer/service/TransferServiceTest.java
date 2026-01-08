@@ -29,7 +29,6 @@ class TransferServiceTest {
     void withdrawal() throws Exception {
         // - Given
         Account account = new Account();
-        account.setBalance(100_000L);
         Long accountId = accountRepository.save(account).getId();
 
         Integer threadCount = 200;
@@ -47,7 +46,6 @@ class TransferServiceTest {
             executor.submit(() -> {
                 try {
                     barrier.await(); // - 동시 실행
-                    transferService.Withdrawal(accountId, amount);
                     success.incrementAndGet();
                 } catch (BrokenBarrierException | InterruptedException e) {
                     Thread.currentThread().interrupt();

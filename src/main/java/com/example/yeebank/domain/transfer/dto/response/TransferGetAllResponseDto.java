@@ -15,7 +15,6 @@ public class TransferGetAllResponseDto {
     private final Long amount;
     private final TransferStatus status;
     private final String failReason;
-    private final Long requestClientId;
     private final LocalDateTime createdAt;
 
 // - Methods
@@ -27,8 +26,7 @@ public class TransferGetAllResponseDto {
                 dto.getAmount(),
                 dto.getStatus(),
                 dto.getFailReason(),
-                dto.getRequestClientId(),
-                dto.getCreateAt()
+                dto.getCreatedAt()
         );
     }
 }
