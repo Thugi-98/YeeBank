@@ -74,8 +74,6 @@ public class AccountController {
 
         // 3. 응답 반환
         return ResponseEntity.ok(commonResponse);
-
-
     }
 
     /**
@@ -134,7 +132,7 @@ public class AccountController {
             @PathVariable Long accountId,
             @RequestParam Long amount) {
         accountService.withdrawal(accountId, amount);
-        AccountDetailResponse result = accountService.deposit(accountId, amount);
+        AccountDetailResponse result = accountService.withdrawal(accountId, amount);
         return ResponseEntity.ok(CommonResponse.success(result, "출금 성공"));
     }
 }

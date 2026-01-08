@@ -23,6 +23,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -193,6 +195,7 @@ public class AccountService {
             Account toAccount = accountRepository.findById(toAccountId)
                     .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
             toAccount.setBalance(toAccount.getBalance() + amount);
+            accountRepository.save(toAccount);
             return AccountDetailResponse.from(toAccount);
         } catch (RuntimeException e) {
             status = TransferStatus.FAIL;
@@ -211,7 +214,13 @@ public class AccountService {
         try {
             Account fromAccount = accountRepository.findById(fromAccountId)
                     .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
-            fromAccount.setBalance(fromAccount.getBalance() - amount);
+            long money = fromAccount.getBalance();
+            if (money >= amount) {
+                fromAccount.setBalance(fromAccount.getBalance() - amount);
+                accountRepository.save(fromAccount);
+            } else {
+                
+            }
             return AccountDetailResponse.from(fromAccount);
         } catch (RuntimeException e) {
             status = TransferStatus.FAIL;
