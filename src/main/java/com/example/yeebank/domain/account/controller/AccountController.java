@@ -27,10 +27,10 @@ public class AccountController {
      * 계좌 생성
      */
     @PostMapping
-    public ResponseEntity<CommonResponse<AccountCreateResponse>> createAccountApi(@RequestHeader("X-User-Id") Long userId,
+    public ResponseEntity<CommonResponse<AccountCreateResponse>> createAccountApi( @AuthenticationPrincipal CustomUserDetails user,
                                                                                   @Valid @RequestBody AccountCreateRequest request) {
         // 1. 서비스 호출
-        AccountCreateResponse responseDto = accountService.createAccount(userId, request);
+        AccountCreateResponse responseDto = accountService.createAccount(user, request);
 
         // 2. Api 래퍼 생성
         CommonResponse<AccountCreateResponse> apiResponse = new CommonResponse<>(true, "계좌 개설 성공", responseDto);

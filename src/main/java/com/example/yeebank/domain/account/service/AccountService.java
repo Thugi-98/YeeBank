@@ -5,8 +5,6 @@ import com.example.yeebank.common.dto.PageResponse;
 import com.example.yeebank.common.exception.CustomException;
 import com.example.yeebank.common.exception.ErrorCode;
 import com.example.yeebank.common.security.CustomUserDetails;
-import com.example.yeebank.common.exception.CustomException;
-import com.example.yeebank.common.exception.ErrorCode;
 import com.example.yeebank.domain.account.dto.request.AccountCreateRequest;
 import com.example.yeebank.domain.account.dto.request.AccountUpdateRequest;
 import com.example.yeebank.domain.account.dto.response.AccountAllResponse;
@@ -42,10 +40,10 @@ public class AccountService {
      * 계좌 생성
      */
     @Transactional
-    public AccountCreateResponse createAccount(Long userId, AccountCreateRequest request) {
+    public AccountCreateResponse createAccount(CustomUserDetails user, AccountCreateRequest request) {
 
         // 1. 계좌 별칭 중복 검사(소프트 딜리트된 계좌는 제외)
-        if (accountRepository.existsByUserIdAndAliasAndIsDeletedFalse(userId, request.getAlias())) {
+        if (accountRepository.existsByUserIdAndAliasAndIsDeletedFalse(user.getUserId(), request.getAlias())) {
             throw new CustomException(ErrorCode.ACCOUNT_DUPLICATE_ALIAS);
         }
         // 2. 계좌번호 생성
@@ -56,7 +54,7 @@ public class AccountService {
 
         // Entity 생성
         Account account = Account.builder()
-                .userId(userId)
+                .userId(user.getUserId())
                 .accountNumber(accountNumber)
                 .password(encodedPassword)
                 .alias(request.getAlias())
