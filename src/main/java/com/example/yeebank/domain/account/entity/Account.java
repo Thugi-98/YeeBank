@@ -4,16 +4,14 @@ import com.example.yeebank.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
-@Getter
 @Entity
 @Table(name = "accounts")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@Setter
+@NoArgsConstructor
 public class Account extends BaseEntity {
 
     @Id
@@ -61,6 +59,10 @@ public class Account extends BaseEntity {
     // 별칭 업데이트 메서드
     public void updateAlias(@NotBlank(message = "계좌 별칭은 필수입니다") @Size(max = 50, message = "별칭은 50자 이하여야 합니다") String alias) {
         this.alias = alias;
+    }
+    // - 잔액 변경
+    public void changeBalance(Long amount) {
+        this.balance += amount;
     }
 }
 

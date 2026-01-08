@@ -1,6 +1,9 @@
 package com.example.yeebank.domain.account.service;
 
+import com.example.yeebank.common.aop.annotation.RedisLock;
 import com.example.yeebank.common.dto.PageResponse;
+import com.example.yeebank.common.exception.CustomException;
+import com.example.yeebank.common.exception.ErrorCode;
 import com.example.yeebank.domain.account.dto.request.AccountCreateRequest;
 import com.example.yeebank.domain.account.dto.request.AccountUpdateRequest;
 import com.example.yeebank.domain.account.dto.response.AccountAllResponse;
@@ -9,6 +12,8 @@ import com.example.yeebank.domain.account.dto.response.AccountDetailResponse;
 import com.example.yeebank.domain.account.dto.response.AccountUpdateResponse;
 import com.example.yeebank.domain.account.entity.Account;
 import com.example.yeebank.domain.account.repository.AccountRepository;
+import com.example.yeebank.domain.transfer.enums.TransferStatus;
+import com.example.yeebank.domain.transfer.service.TransferService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,6 +33,7 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TransferService transferService;
 
     /**
      * 계좌 생성
@@ -176,5 +182,41 @@ public class AccountService {
 
     }
 
+    // - 입금
+    @RedisLock(key = "lock:account:")
+    @Transactional
+    public void deposit(Long toAccountId, Long amount) {
+        TransferStatus status = TransferStatus.SUCCESS;
+        String failReason = null;
 
+        try {
+            Account toAccount = accountRepository.findById(toAccountId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
+            toAccount.setBalance(toAccount.getBalance() + amount);
+        } catch (RuntimeException e) {
+            status = TransferStatus.FAIL;
+            failReason = e.getMessage();
+            throw e;
+        } finally {
+            transferService.deposit(toAccountId, amount, status, failReason);
+        }
+    }
+    @RedisLock(key = "lock:account:")
+    @Transactional
+    public void withdrawal(Long fromAccountId, Long amount) {
+        TransferStatus status = TransferStatus.SUCCESS;
+        String failReason = null;
+
+        try {
+            Account fromAccount = accountRepository.findById(fromAccountId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
+            fromAccount.setBalance(fromAccount.getBalance() - amount);
+        } catch (RuntimeException e) {
+            status = TransferStatus.FAIL;
+            failReason = e.getMessage();
+            throw e;
+        } finally {
+            transferService.withdrawal(fromAccountId, amount, status, failReason);
+        }
+    }
 }
