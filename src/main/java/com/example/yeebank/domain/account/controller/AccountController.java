@@ -120,7 +120,23 @@ public class AccountController {
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-
+    // - 입금
+    @PostMapping("/{accountId}/deposit")
+    public ResponseEntity<CommonResponse<AccountDetailResponse>> deposit(
+            @PathVariable Long accountId,
+            @RequestParam Long amount) {
+        AccountDetailResponse result = accountService.deposit(accountId, amount);
+        return ResponseEntity.ok(CommonResponse.success(result, "입금 성공"));
+    }
+    // - 출금
+    @PostMapping("/{accountId}/withdraw")
+    public ResponseEntity<CommonResponse<AccountDetailResponse>> withdraw(
+            @PathVariable Long accountId,
+            @RequestParam Long amount) {
+        accountService.withdrawal(accountId, amount);
+        AccountDetailResponse result = accountService.deposit(accountId, amount);
+        return ResponseEntity.ok(CommonResponse.success(result, "출금 성공"));
+    }
 }
 
 

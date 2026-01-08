@@ -185,7 +185,7 @@ public class AccountService {
     // - 입금
     @RedisLock(key = "lock:account:")
     @Transactional
-    public void deposit(Long toAccountId, Long amount) {
+    public AccountDetailResponse deposit(Long toAccountId, Long amount) {
         TransferStatus status = TransferStatus.SUCCESS;
         String failReason = null;
 
@@ -193,6 +193,7 @@ public class AccountService {
             Account toAccount = accountRepository.findById(toAccountId)
                     .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
             toAccount.setBalance(toAccount.getBalance() + amount);
+            return AccountDetailResponse.from(toAccount);
         } catch (RuntimeException e) {
             status = TransferStatus.FAIL;
             failReason = e.getMessage();
@@ -203,7 +204,7 @@ public class AccountService {
     }
     @RedisLock(key = "lock:account:")
     @Transactional
-    public void withdrawal(Long fromAccountId, Long amount) {
+    public AccountDetailResponse withdrawal(Long fromAccountId, Long amount) {
         TransferStatus status = TransferStatus.SUCCESS;
         String failReason = null;
 
@@ -211,6 +212,7 @@ public class AccountService {
             Account fromAccount = accountRepository.findById(fromAccountId)
                     .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
             fromAccount.setBalance(fromAccount.getBalance() - amount);
+            return AccountDetailResponse.from(fromAccount);
         } catch (RuntimeException e) {
             status = TransferStatus.FAIL;
             failReason = e.getMessage();
