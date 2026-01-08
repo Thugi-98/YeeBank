@@ -2,6 +2,7 @@ package com.example.yeebank.domain.account.controller;
 
 import com.example.yeebank.common.dto.CommonResponse;
 import com.example.yeebank.common.dto.PageResponse;
+import com.example.yeebank.common.security.CustomUserDetails;
 import com.example.yeebank.domain.account.dto.request.AccountCreateRequest;
 import com.example.yeebank.domain.account.dto.request.AccountDeleteRequest;
 import com.example.yeebank.domain.account.dto.request.AccountUpdateRequest;
@@ -11,8 +12,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDateTime;
 
 
 @RestController
@@ -26,16 +27,16 @@ public class AccountController {
      * 계좌 생성
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<AccountCreateResponse>> createAccountApi(@RequestHeader("X-User-Id") Long userId,
-                                                                               @Valid @RequestBody AccountCreateRequest request) {
+    public ResponseEntity<CommonResponse<AccountCreateResponse>> createAccountApi( @AuthenticationPrincipal CustomUserDetails user,
+                                                                                  @Valid @RequestBody AccountCreateRequest request) {
         // 1. 서비스 호출
-        AccountCreateResponse responseDto = accountService.createAccount(userId, request);
+        AccountCreateResponse responseDto = accountService.createAccount(user, request);
 
         // 2. Api 래퍼 생성
-        ApiResponse<AccountCreateResponse> apiResponse = new ApiResponse<>(true, "계좌 개설 성공", responseDto, LocalDateTime.now());
+        CommonResponse<AccountCreateResponse> apiResponse = new CommonResponse<>(true, "계좌 개설 성공", responseDto);
 
         // 3. ResponseEntity 생성
-        ResponseEntity<ApiResponse<AccountCreateResponse>> response = new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+        ResponseEntity<CommonResponse<AccountCreateResponse>> response = new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
         return response;
     }
 
@@ -43,18 +44,19 @@ public class AccountController {
      * 계좌 상세조회
      */
     @GetMapping("/{accountId}")
-    public ResponseEntity<ApiResponse<AccountDetailResponse>> getAccountApi(@PathVariable Long accountId,
-                                                                            @RequestAttribute Long userId,
-                                                                            @RequestHeader("X-Account-Password") String password) {
+    public ResponseEntity<CommonResponse<AccountDetailResponse>> getAccountApi(@PathVariable Long accountId, @AuthenticationPrincipal CustomUserDetails user,
+                                                                               @RequestHeader("X-Account-Password") String password) {
+
 
         // 1. 서비스 호출
-        AccountDetailResponse responseDto = accountService.getAccount(accountId, userId, password);
+        AccountDetailResponse responseDto = accountService.getAccount(accountId, user, password);
+
 
         // 2. Api 래퍼 생성
-        ApiResponse<AccountDetailResponse> apiResponse = new ApiResponse<>(true, "계좌 정보 조회 성공", responseDto, LocalDateTime.now());
+        CommonResponse<AccountDetailResponse> apiResponse = new CommonResponse<>(true, "계좌 정보 조회 성공", responseDto);
 
         // 3. ResponseEntity 생성
-        ResponseEntity<ApiResponse<AccountDetailResponse>> response = new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        ResponseEntity<CommonResponse<AccountDetailResponse>> response = new ResponseEntity<>(apiResponse, HttpStatus.OK);
         return response;
     }
 
@@ -62,15 +64,16 @@ public class AccountController {
      * 계좌 목록조회 -> 페이징 적용
      */
     @GetMapping
-    public ResponseEntity<CommonResponse<PageResponse<AccountAllResponse>>> getAccountListApi(@RequestAttribute Long userId,
-                                  @RequestParam(defaultValue = "0") int page,
-                                  @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<CommonResponse<PageResponse<AccountAllResponse>>> getAccountListApi(@AuthenticationPrincipal CustomUserDetails user,
+                                                                                              @RequestParam(defaultValue = "0") int page,
+                                                                                              @RequestParam(defaultValue = "10") int size) {
+
 
         // 1. 서비스 호출(페이징)
-        PageResponse<AccountAllResponse> accountAllResponsePage = accountService.getAccountList(userId, page, size);
+        PageResponse<AccountAllResponse> accountAllResponsePage = accountService.getAccountList(user, page, size);
 
         // 2. 공통 응답 생성
-        CommonResponse<PageResponse<AccountAllResponse>> commonResponse = CommonResponse.success(accountAllResponsePage,"계좌 목록 조회 성공.");
+        CommonResponse<PageResponse<AccountAllResponse>> commonResponse = CommonResponse.success(accountAllResponsePage, "계좌 목록 조회 성공.");
 
         // 3. 응답 반환
         return ResponseEntity.ok(commonResponse);
@@ -80,18 +83,16 @@ public class AccountController {
      * 계좌 수정
      */
     @PutMapping("/{accountId}")
-    public ResponseEntity<ApiResponse<AccountUpdateResponse>> updateAccountApi(@PathVariable Long accountId,
-                                                                               @RequestAttribute Long userId,
-                                                                               @Valid @RequestBody AccountUpdateRequest request
+    public ResponseEntity<CommonResponse<AccountUpdateResponse>> updateAccountApi(@PathVariable Long accountId, @AuthenticationPrincipal CustomUserDetails user,
+                                                                                  @Valid @RequestBody AccountUpdateRequest request
     ) {
-
         // 1. 서비스 호출
         AccountUpdateResponse responseDto =
-                accountService.updateAccount(accountId, userId, request);
+                accountService.updateAccount(accountId, user, request);
 
         // 2. Api 래퍼 생성
-        ApiResponse<AccountUpdateResponse> apiResponse =
-                new ApiResponse<>(true, "사용자 정보가 수정되었습니다.", responseDto, LocalDateTime.now());
+        CommonResponse<AccountUpdateResponse> apiResponse =
+                new CommonResponse<>(true, "사용자 정보가 수정되었습니다.", responseDto);
 
         // 3. ResponseEntity 생성
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
@@ -103,16 +104,15 @@ public class AccountController {
      * 계좌 삭제(소프트 딜리트)
      */
     @DeleteMapping("/{accountId}")
-    public ResponseEntity<ApiResponse<Void>> deleteAccountApi(@PathVariable Long accountId,
-                                                              @RequestAttribute Long userId,
-                                                              @Valid @RequestBody AccountDeleteRequest request) {
+    public ResponseEntity<CommonResponse<Void>> deleteAccountApi(@PathVariable Long accountId, @AuthenticationPrincipal CustomUserDetails user,
+                                                                 @Valid @RequestBody AccountDeleteRequest request) {
 
         // 1. 서비스 호출
-        accountService.deleteAccount(accountId, userId, request.getPassword());
+        accountService.deleteAccount(accountId, user, request.getPassword());
 
         // 2. Api 래퍼 생성
-        ApiResponse<Void> apiResponse =
-                new ApiResponse<>(true, "계좌 삭제 성공", null, LocalDateTime.now());
+        CommonResponse<Void> apiResponse =
+                new CommonResponse<>(true, "계좌 삭제 성공", null);
 
         // 3. ResponseEntity 생성 (200 OK)
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
