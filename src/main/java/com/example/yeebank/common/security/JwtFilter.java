@@ -40,6 +40,11 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
+        if(requestURL.equals("/api/rates")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // 너 토큰 있어? 없어?
         String authorizationHeader = request.getHeader("Authorization");
 

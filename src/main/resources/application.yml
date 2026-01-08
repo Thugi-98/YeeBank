@@ -12,6 +12,9 @@ spring:
       hibernate:
         format_sql: true
     defer-datasource-initialization: true
+  cache:
+    caffeine:
+      spec: maximumSize=100, expireAfterWrite=15m
 
 jwt:
   secret:
