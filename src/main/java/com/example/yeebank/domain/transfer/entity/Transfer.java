@@ -1,32 +1,44 @@
 package com.example.yeebank.domain.transfer.entity;
 
-import com.example.yeebank.common.entity.BaseEntity;
+import com.example.yeebank.domain.transfer.enums.TransferStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-@Getter
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "transfers")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Transfer extends BaseEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Transfer {
+// - Properties
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
+    @Column(name = "from_account_id")
+    private Long fromAccountId;
+    @Column(name = "to_account_id")
+    private Long toAccountId;
+    @Column(name = "amount", nullable = false)
     private Long amount;
+    @Column(name = "status", nullable = false) @Enumerated(EnumType.STRING)
+    private TransferStatus status;
+    @Column(name = "fail_reason", length = 200)
+    private String failReason;
+    @Column(name = "created_at") @CreatedDate
+    private LocalDateTime createdAt;
 
-    @Column(length = 500, nullable = false)
-    private String status;
-
-    @Column(length = 200)
-    private String fail_reason;
-
-    @Column
-    private Long request_client_id;
+// - Methods
+    public Transfer(Long fromAccountId, Long toAccountId, Long amount, TransferStatus status, String failReason) {
+        this.fromAccountId = fromAccountId;
+        this.toAccountId = toAccountId;
+        this.amount = amount;
+        this.status = status;
+        this.failReason = failReason;
+    }
 }

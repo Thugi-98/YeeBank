@@ -1,7 +1,9 @@
 package com.example.yeebank.domain.user.service;
 
+import com.example.yeebank.common.dto.PageResponse;
 import com.example.yeebank.common.exception.CustomException;
 import com.example.yeebank.common.exception.ErrorCode;
+import com.example.yeebank.common.security.CustomUserDetails;
 import com.example.yeebank.domain.user.dto.dto.UserDto;
 import com.example.yeebank.domain.user.dto.request.UserCreateRequestDto;
 import com.example.yeebank.domain.user.dto.request.UserUpdateRequestDto;
@@ -70,7 +72,7 @@ public class UserService {
      * 유저 전체조회 로직
      */
     @Transactional(readOnly = true)
-    public Page<UserGetAllResponseDto> getAllUser(Integer page, Integer size) {
+    public PageResponse<UserGetAllResponseDto> getAllUser(Integer page, Integer size) {
 
         Pageable pageable = PageRequest.of(page, size);
 
@@ -78,15 +80,15 @@ public class UserService {
 
         Page<UserGetAllResponseDto> responseDtoPage = findUserList.map(UserGetAllResponseDto::from);
 
-        return responseDtoPage;
+        return PageResponse.from(responseDtoPage);
     }
 
     /**
      * 유저 정보(비밀번호) 수정 로직
      */
     @Transactional
-    public UserUpdateResponseDto updateUser(Long userId, UserUpdateRequestDto requestDto) {
-        User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
+    public UserUpdateResponseDto updateUser(CustomUserDetails user, UserUpdateRequestDto requestDto) {
+        User findUser = userRepository.findUserByIdAndIsDeletedFalse(user.getUserId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(requestDto.getBeforePassword(), findUser.getPassword())) {
@@ -112,8 +114,8 @@ public class UserService {
      * 유저 삭제(소프트 딜리트) 로직
      */
     @Transactional
-    public void deleteUser(Long userId) {
-        User findUser = userRepository.findUserByIdAndIsDeletedFalse(userId)
+    public void deleteUser(CustomUserDetails user) {
+        User findUser = userRepository.findUserByIdAndIsDeletedFalse(user.getUserId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         findUser.delete();

@@ -1,6 +1,8 @@
 package com.example.yeebank.common.auth.service;
 
 import com.example.yeebank.common.auth.dto.request.LoginRequestDto;
+import com.example.yeebank.common.exception.CustomException;
+import com.example.yeebank.common.exception.ErrorCode;
 import com.example.yeebank.common.security.JwtUtil;
 import com.example.yeebank.domain.user.entity.User;
 import com.example.yeebank.domain.user.repository.UserRepository;
@@ -22,10 +24,10 @@ public class LoginService {
         String password = request.getPassword();
 
         User user = userRepository.findUserByEmailAndIsDeletedFalse(email)
-                .orElseThrow(() -> new IllegalArgumentException("이메일 혹은 비밀번호가 일치하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if(!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("이메일 혹은 비밀번호가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
         return jwtUtil.generateToken(user.getName(), user.getEmail());

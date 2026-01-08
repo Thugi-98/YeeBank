@@ -40,6 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
+        // 토큰 보유 여부 확인
         if(requestURL.equals("/api/rates")) {
             filterChain.doFilter(request, response);
             return;
@@ -53,8 +54,7 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 토큰이 있어? 그럼 그 토큰 유효해?
-
+        // 토큰 유효성 검사
         String jwt = authorizationHeader.substring(7);
 
         if(!jwtUtil.validateToken(jwt)) {
@@ -62,8 +62,7 @@ public class JwtFilter extends OncePerRequestFilter {
             response.getWriter().write("{\"error\": \"Unauthorized\"}");
         }
 
-        // 유효하면 어떤 정보를 가지고 있어?
-
+        // 토큰 정보 확인
         String email = jwtUtil.extractUsername(jwt);
 
         // Spring Security에서 사용하는 User 객체 생성
