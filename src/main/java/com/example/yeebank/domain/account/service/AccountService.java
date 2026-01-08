@@ -4,6 +4,7 @@ import com.example.yeebank.common.aop.annotation.RedisLock;
 import com.example.yeebank.common.dto.PageResponse;
 import com.example.yeebank.common.exception.CustomException;
 import com.example.yeebank.common.exception.ErrorCode;
+import com.example.yeebank.common.security.CustomUserDetails;
 import com.example.yeebank.domain.account.dto.request.AccountCreateRequest;
 import com.example.yeebank.domain.account.dto.request.AccountUpdateRequest;
 import com.example.yeebank.domain.account.dto.response.AccountAllResponse;
@@ -39,11 +40,11 @@ public class AccountService {
      * 계좌 생성
      */
     @Transactional
-    public AccountCreateResponse createAccount(Long userId, AccountCreateRequest request) {
+    public AccountCreateResponse createAccount(CustomUserDetails user, AccountCreateRequest request) {
 
         // 1. 계좌 별칭 중복 검사(소프트 딜리트된 계좌는 제외)
-        if (accountRepository.existsByUserIdAndAliasAndIsDeletedFalse(userId, request.getAlias())) {
-            throw new RuntimeException("이미 존재하는 계좌 별칭입니다."); // 나중에 수정 (예외처리부분)
+        if (accountRepository.existsByUserIdAndAliasAndIsDeletedFalse(user.getUserId(), request.getAlias())) {
+            throw new CustomException(ErrorCode.ACCOUNT_DUPLICATE_ALIAS);
         }
         // 2. 계좌번호 생성
         String accountNumber = generateAccountNumber();
@@ -53,7 +54,7 @@ public class AccountService {
 
         // Entity 생성
         Account account = Account.builder()
-                .userId(userId)
+                .userId(user.getUserId())
                 .accountNumber(accountNumber)
                 .password(encodedPassword)
                 .alias(request.getAlias())
@@ -83,19 +84,19 @@ public class AccountService {
     /**
      * 계좌 상세조회
      */
-    public AccountDetailResponse getAccount(Long accountId, Long userId, String password) {
+    public AccountDetailResponse getAccount(Long accountId, CustomUserDetails user, String password) {
         // 1. 계좌 조회 (소프트 딜리트 제외)
         Account account = accountRepository.findByIdAndIsDeletedFalse(accountId)
-                .orElseThrow(() -> new RuntimeException("계좌를 찾을 수 없습니다"));
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         // 2. 본인 계좌인지 확인
-        if (!account.getUserId().equals(userId)) {
-            throw new RuntimeException("본인의 계좌만 조회할 수 있습니다.");
+        if (!account.getUserId().equals(user.getUserId())) {
+            throw new CustomException(ErrorCode.ACCOUNT_ACCESS_DENIED);
         }
 
         // 3. 비밀번호 일치여부 검증
         if (!passwordEncoder.matches(password,account.getPassword())) {
-            throw new RuntimeException("계좌 비밀번호가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.ACCOUNT_INVALID_PASSWORD);
         }
 
         // 4. Response DTO로 변환 (정적 팩토리 메서드)
@@ -105,13 +106,13 @@ public class AccountService {
     /**
      * 계좌 목록조회 -> 페이징 적용
      */
-    public PageResponse<AccountAllResponse> getAccountList(Long userId, int page, int size) {
-        log.info("계좌 목록 조회 - userId: {}, page: {}, size: {}", userId, page, size);
+    public PageResponse<AccountAllResponse> getAccountList(CustomUserDetails user, int page, int size) {
+        log.info("계좌 목록 조회 - user: {}, page: {}, size: {}", user, page, size);
         // 1. Pageable 생성 (최신순 정렬)
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // 2. 페이징 조회
-        Page<Account> accountPage = accountRepository.findAllByUserIdAndIsDeletedFalse(userId, pageable);
+        Page<Account> accountPage = accountRepository.findAllByUserIdAndIsDeletedFalse(user.getUserId(), pageable);
 
         // 3. Response DTO로 변환
         Page<AccountAllResponse> responsePage = accountPage.map(AccountAllResponse::from);
@@ -123,27 +124,27 @@ public class AccountService {
      * 계좌 수정
      */
     @Transactional
-    public AccountUpdateResponse updateAccount(Long accountId, Long userId, AccountUpdateRequest request) {
-        log.info("계좌 수정 - accountId: {}, userId: {}, newAlias: {}", accountId, userId, request.getAlias());
+    public AccountUpdateResponse updateAccount(Long accountId, CustomUserDetails user, AccountUpdateRequest request) {
+        log.info("계좌 수정 - accountId: {}, user: {}, newAlias: {}", accountId, user, request.getAlias());
         // 1. 계좌 조회
         Account account = accountRepository.findByIdAndIsDeletedFalse(accountId)
-                .orElseThrow(() -> new RuntimeException("계좌를 찾을 수 없습니다"));
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         // 2. 본인 계좌인지 확인
-        if (!account.getUserId().equals(userId)) {
-            throw new RuntimeException("본인의 계좌만 수정할 수 있습니다.");
+        if (!account.getUserId().equals(user.getUserId())) {
+            throw new CustomException(ErrorCode.ACCOUNT_ACCESS_DENIED);
         }
 
         // 3. 별칭 중복 검사 (자기 자신 제외)
-        if (accountRepository.existsByUserIdAndAliasAndIsDeletedFalse(userId, request.getAlias())) {
+        if (accountRepository.existsByUserIdAndAliasAndIsDeletedFalse(user.getUserId(), request.getAlias())) {
             // 같은 별칭으로 수정하는 경우는 허용
             if (!account.getAlias().equals(request.getAlias())) {
-                throw new RuntimeException("이미 존재하는 계좌 별칭입니다.");
+                throw new CustomException(ErrorCode.ACCOUNT_DUPLICATE_ALIAS);
             }
         }
         // 4. 비밀번호 검증
         if (!passwordEncoder.matches(request.getPassword(),account.getPassword())) {
-            throw new RuntimeException("계좌 비밀번호가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.ACCOUNT_INVALID_PASSWORD);
         }
 
         // 5. 별칭 업데이트
@@ -157,24 +158,24 @@ public class AccountService {
      * 계좌 삭제(소프트 딜리트)
      */
     @Transactional
-    public void deleteAccount(Long accountId, Long userId, String password) {
+    public void deleteAccount(Long accountId,CustomUserDetails user , String password) {
         // 1. 계좌 조회
         Account account = accountRepository.findByIdAndIsDeletedFalse(accountId)
-                .orElseThrow(() -> new RuntimeException("계좌를 찾을 수 없습니다"));
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         // 2. 본인 계좌인지 확인
-        if (!account.getUserId().equals(userId)) {
-            throw new RuntimeException("본인의 계좌만 삭제할 수 있습니다.");
+        if (!account.getUserId().equals(user.getUserId())) {
+            throw new CustomException(ErrorCode.ACCOUNT_ACCESS_DENIED);
         }
 
         // 3. 비밀번호 일치여부 검증
         if (!passwordEncoder.matches(password,account.getPassword())) {
-            throw new RuntimeException("계좌 비밀번호가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.ACCOUNT_INVALID_PASSWORD);
         }
 
         // 4. 잔액 확인
         if (account.getBalance() > 0) {
-            throw new RuntimeException("잔액이 있는 계좌는 삭제할 수 없습니다.");
+            throw new CustomException(ErrorCode.ACCOUNT_BALANCE_NOT_EMPTY);
         }
 
         // 5. 소프트 딜리트

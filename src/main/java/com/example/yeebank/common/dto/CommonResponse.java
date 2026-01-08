@@ -14,10 +14,12 @@ public class CommonResponse<T> {
     private final T data;                  // 성공 시 data , 실패시 null
 
     public CommonResponse(boolean success, String message, T data) {
+
         this.success = success;
         this.message = message;
         this.data = data;
         this.timestamp = LocalDateTime.now();
+
     }
 
     // 성공시 공용 응답 객체

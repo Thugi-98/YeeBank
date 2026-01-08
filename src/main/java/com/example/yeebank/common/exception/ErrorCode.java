@@ -31,10 +31,13 @@ public enum ErrorCode {
     // 계좌 관련 ErrorCode
     ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "계좌가 존재하지 않습니다."),
     ACCOUNT_DUPLICATE_NUMBER(HttpStatus.CONFLICT, "이미 존재하는 계좌번호입니다."),
+    ACCOUNT_DUPLICATE_ALIAS(HttpStatus.CONFLICT, "이미 존재하는 계좌 별칭입니다."),
+    ACCOUNT_ACCESS_DENIED(HttpStatus.FORBIDDEN,"본인의 계좌만 조회할 수 있습니다."),
+    ACCOUNT_INVALID_PASSWORD(HttpStatus.BAD_REQUEST,"계좌 비밀번호가 일치하지 않습니다."),
+    ACCOUNT_BALANCE_NOT_EMPTY(HttpStatus.BAD_REQUEST,"잔액이 있는 계좌는 삭제할 수 없습니다."),
 
     // 거래 관련 ErrorCode
     TRANSFER_NOT_FOUND_SEND(HttpStatus.NOT_FOUND, "존재하지 않는 계좌로는 송금을 할 수 없습니다."),
-//    TRANSFER_AMOUNT_MISS(HttpStatus.N , ""), //보유 잔액이 부족할때
     TRANSFER_CLIENT_MISS(HttpStatus.NOT_FOUND, "요청 클라이언트를 찾을 수 없습니다."),
 
     // Lock 관련 ErrorCode
