@@ -205,6 +205,7 @@ public class AccountService {
             transferService.deposit(toAccountId, amount, status, failReason);
         }
     }
+    // - 출금
     @RedisLock(key = "lock:account:")
     @Transactional
     public AccountDetailResponse withdrawal(Long fromAccountId, Long amount) {
