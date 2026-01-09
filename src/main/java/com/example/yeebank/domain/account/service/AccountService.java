@@ -218,8 +218,6 @@ public class AccountService {
             if (money >= amount) {
                 fromAccount.setBalance(fromAccount.getBalance() - amount);
                 accountRepository.save(fromAccount);
-            } else {
-
             }
             return AccountDetailResponse.from(fromAccount);
         } catch (RuntimeException e) {

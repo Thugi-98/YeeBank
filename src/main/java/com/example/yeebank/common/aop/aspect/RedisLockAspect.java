@@ -4,6 +4,8 @@ import com.example.yeebank.common.aop.annotation.RedisLock;
 import com.example.yeebank.common.exception.CustomException;
 import com.example.yeebank.common.exception.ErrorCode;
 import com.example.yeebank.common.redis.RedisLockService;
+import com.example.yeebank.domain.transfer.enums.TransferStatus;
+import com.example.yeebank.domain.transfer.service.TransferService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -30,6 +32,7 @@ import java.util.UUID;
 public class RedisLockAspect {
 
     private final RedisLockService lockService;
+    private final TransferService transferService;
 
     // ✅ 포인트컷 변수 바인딩 제거: @annotation(redisLock) -> @annotation(풀패키지)
     @Around("@annotation(com.example.yeebank.common.aop.annotation.RedisLock)")
@@ -67,25 +70,16 @@ public class RedisLockAspect {
                 .map(id -> keyPreFix + id)
                 .toList();
 
-        List<String> acquiredKeys = new ArrayList<>();
-
-        try {
-            long deadlinNanos = System.nanoTime() + timeoutSeconds * 1_000_000_000L;
-
-            for (String key : keys) {
-                boolean locked = tryLockWithRetry(key, value, timeoutSeconds, deadlinNanos);
-                if (!locked) {
-                    throw new CustomException(ErrorCode.LOCK_EXIST_REQUEST);
-                }
-                acquiredKeys.add(key);
-            }
-
-            return joinPoint.proceed();
-        } finally {
-            for (int i = acquiredKeys.size() - 1; i >= 0; i--) {
-                lockService.unlock(acquiredKeys.get(i), value);
+        for (String key : keys) {
+            Boolean ok = lockService.tryLock(key, value, timeoutSeconds);
+            if (!Boolean.TRUE.equals(ok)) {
+                recordLockFail(targetMethod.getName(), joinPoint.getArgs());
+                throw new CustomException(ErrorCode.LOCK_EXIST_REQUEST);
             }
         }
+
+        return joinPoint.proceed();
+
     }
 
     private boolean tryLockWithRetry(String key, String value, long ttlSeconds, long deadlineNanos) {
@@ -96,6 +90,22 @@ public class RedisLockAspect {
             catch (InterruptedException e) { Thread.currentThread().interrupt(); return false; }
         }
         return false;
+    }
+
+    private void recordLockFail(String methodName, Object[] args) {
+        String reason = "요청이 이미 실행중 입니다.";
+
+        if (methodName.equalsIgnoreCase("withdrawal")) {
+            Long fromAccountid = (Long) args[0];
+            Long amount = (Long) args[1];
+            transferService.withdrawal(fromAccountid, amount, TransferStatus.FAIL, reason);
+        }
+
+        if (methodName.equalsIgnoreCase("deposit")) {
+            Long toAccountId = (Long) args[0];
+            Long amount = (Long) args[1];
+            transferService.deposit(toAccountId, amount, TransferStatus.FAIL, reason);
+        }
     }
 
     private Long castToLong(Object value, String name) {
